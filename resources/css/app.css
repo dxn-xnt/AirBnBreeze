@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+@layer base {
+    html {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+        @apply bg-airbnb-light text-gray-800;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply px-4 py-2 rounded-full font-medium transition-colors duration-200;
+    }
+
+    .btn-primary {
+        @apply bg-airbnb-darkest text-airbnb-light hover:bg-opacity-90;
+    }
+
+    .btn-outline {
+        @apply border border-current text-airbnb-light hover:bg-opacity-10 hover:bg-white;
+    }
+
+    .card {
+        @apply bg-airbnb-light rounded-2xl border-[1.5px] border-airbnb-darkest overflow-hidden relative shadow-md;
+    }
+
+    .input-field {
+        @apply bg-transparent border-none outline-none text-lg font-medium w-full;
+    }
+
+    .filter-icon {
+        @apply w-7 h-7 flex items-center justify-center flex-shrink-0;
+    }
+}
