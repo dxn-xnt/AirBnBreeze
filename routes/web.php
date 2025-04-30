@@ -11,6 +11,9 @@ Route::get('/', [PropertyController::class, 'index'])->name('home');
 // Log In Page
 Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 
+// Sign Up Page
+Route::get('/signup', [UserController::class, 'showSignUp'])->name('signup');
+
 // Property details page
 Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
 

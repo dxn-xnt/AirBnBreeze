@@ -14,7 +14,11 @@ class UserController extends Controller
     }
     public function showLogin()
     {
-        return redirect()->route('user.login');
+        return view('pages.login');
+    }
+    public function showSignUp()
+    {
+        return view('pages.signup');
     }
     public function getAllUser(){
         $users = User::all();

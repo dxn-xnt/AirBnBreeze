@@ -6,29 +6,29 @@
     <div class="max-w-[1750px] mx-auto px-8 md:px-32 mt-[120px]">
         <!-- Property Title -->
         <h1 class="text-[28px] font-semibold text-airbnb-darkest mb-5">{{ $property['name'] }}</h1>
-        
+
         <!-- Image Gallery -->
         <div class="flex flex-col lg:flex-row mb-5 gap-4">
             <div class="flex-[1.5]">
-                <img src="{{ asset($property['images']['main']) }}" 
-                     alt="Main view" 
+                <img src="{{ asset($property['images']['main']) }}"
+                     alt="Main view"
                      class="w-full h-[400px] object-cover rounded-2xl border border-airbnb-darkest shadow-md">
             </div>
             <div class="flex-1 flex flex-col gap-4">
                 <div class="flex gap-4 h-1/2">
                     @foreach(array_slice($property['images']['gallery'], 0, 2) as $image)
-                        <img src="{{ asset($image) }}" 
-                             alt="View" 
+                        <img src="{{ asset($image) }}"
+                             alt="View"
                              class="w-full h-[190px] object-cover rounded-2xl border border-airbnb-darkest shadow-md">
                     @endforeach
                 </div>
                 <div class="flex gap-4 h-1/2">
-                    <img src="{{ asset($property['images']['gallery'][2]) }}" 
-                         alt="View" 
+                    <img src="{{ asset($property['images']['gallery'][2]) }}"
+                         alt="View"
                          class="w-full h-[190px] object-cover rounded-2xl border border-airbnb-darkest shadow-md">
                     <div class="relative w-full">
-                        <img src="{{ asset($property['images']['gallery'][3]) }}" 
-                             alt="View" 
+                        <img src="{{ asset($property['images']['gallery'][3]) }}"
+                             alt="View"
                              class="w-full h-[190px] object-cover rounded-2xl border border-airbnb-darkest shadow-md">
                         <span class="absolute bottom-[10px] right-[10px] bg-airbnb-light text-airbnb-darkest py-1 px-2.5 rounded-2xl text-xs font-semibold cursor-pointer">
                             Show All Photos
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Property Info Row -->
         <div class="flex flex-col lg:flex-row justify-between items-start mb-5">
             <div class="flex flex-col gap-1.5">
@@ -51,7 +51,7 @@
                     <span class="text-sm text-airbnb-darkest underline italic">{{ $property['reviews'] }} Reviews</span>
                 </div>
             </div>
-            
+
             <div class="mt-4 lg:mt-0">
                 <form action="{{ route('bookings.book', $property['id']) }}" method="POST">
                     @csrf
@@ -61,16 +61,16 @@
                 </form>
             </div>
         </div>
-        
+
         <!-- Property Description -->
         <div class="text-lg leading-relaxed text-airbnb-darkest mb-8">
             <p>{{ $property['description'] }}</p>
         </div>
-        
+
         <!-- Host Information -->
         <div class="flex items-center gap-4 mb-8">
-            <img src="{{ asset($property['host']['image']) }}" 
-                 alt="{{ $property['host']['name'] }}" 
+            <img src="{{ asset($property['host']['image']) }}"
+                 alt="{{ $property['host']['name'] }}"
                  class="w-20 h-20 rounded-full border border-airbnb-darkest object-cover">
             <div>
                 <h3 class="text-base font-semibold m-0 mb-0.5 text-airbnb-darkest">{{ $property['host']['name'] }}</h3>
@@ -78,7 +78,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Amenities Section -->
     <div class="relative w-screen left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-airbnb-dark mb-[18px] py-8">
         <div class="w-full text-airbnb-light">
@@ -89,7 +89,7 @@
                         Show All Amenities
                     </button>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     @foreach($property['amenities'] as $amenity)
                         <x-amenity-item :icon="$amenity['icon']" :name="$amenity['name']" />
@@ -98,7 +98,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Things to Know -->
     <div class="max-w-[1750px] mx-auto px-8 md:px-32 py-6 mb-12 bg-airbnb-light rounded-2xl">
         <h2 class="text-[22px] font-semibold mb-6 text-airbnb-darkest">Things to know</h2>
