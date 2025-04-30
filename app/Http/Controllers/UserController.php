@@ -12,6 +12,10 @@ class UserController extends Controller
     {
         //
     }
+    public function showLogin()
+    {
+        return redirect()->route('user.login');
+    }
     public function getAllUser(){
         $users = User::all();
         return validateData($users, "fetched all");
@@ -52,7 +56,7 @@ class UserController extends Controller
     public function updateUser(Request $request, $id){
         $user = User::find($id);
         validateData($user, "fetched");
-        
+
         $validated = $request->validate([
             'user_name' => 'required|string|max:50',
             'user_contact_number' => 'required|string|max:11',
@@ -80,10 +84,10 @@ class UserController extends Controller
         $user->delete();
         return response()->json(["message" => "User deleted successfully"],200);
     }
-    
+
 }
 
-function validateData($data, $method) 
+function validateData($data, $method)
 {
     $message = "Succesfully {$method} user";
     if ($data) {

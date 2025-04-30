@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\BookingController;
 
 // Home page with property listings
 Route::get('/', [PropertyController::class, 'index'])->name('home');
+
+// Log In Page
+Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 
 // Property details page
 Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
