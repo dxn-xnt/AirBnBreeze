@@ -44,10 +44,41 @@ class UserController extends Controller
         $validated['user_password'] = Hash::make($request->user_password);
 
         // Create the user
-        $user = User::create($validated);
+        $result = User::create($validated);
 
         // Return the success response
-        validateData($user, "created");
+        return validateData($result, "created");
+    }
+    public function updateUser(Request $request, $id){
+        $user = User::find($id);
+        validateData($user, "fetched");
+        
+        $validated = $request->validate([
+            'user_name' => 'required|string|max:50',
+            'user_contact_number' => 'required|string|max:11',
+            'user_email' => 'required|email|max:50',
+            'user_password' => 'required|string|max:100',
+            'user_date_created' => 'required|date',
+            'user_profile' => 'nullable|string|max:250',
+            'user_is_guest'=> 'required|boolean',
+            'user_is_host'=> 'required|boolean'
+        ]);
+
+        if($user->user_email !== $request->user_email){
+            if(User::where('user_email',$request->user_email)->exists()){
+                return response()->json(["message" => "User email already exists"],404);
+            }
+        }
+        $user->update($validated);
+        return response()->json(["message" => "User updated successfully"],200);
+    }
+    public function deleteUser($id){
+        $user = User::find($id);
+        if(!$user){
+            return response()->json(["message" => "User not found"],404);
+        }
+        $user->delete();
+        return response()->json(["message" => "User deleted successfully"],200);
     }
     
 }

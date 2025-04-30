@@ -13,6 +13,8 @@ class Property extends Model
         'prop_description',
         'prop_price_per_night',
         'prop_max_guest',
+        'prop_room_count',
+        'prop_bathroom_count',
         'prop_status',
         'prop_address',
         'prop_date_created',
