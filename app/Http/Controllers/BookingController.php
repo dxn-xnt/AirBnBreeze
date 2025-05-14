@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 
 class BookingController extends Controller
 {
-    
-     
+    // Display the user's bookings
     public function index()
     {
         // Mock bookings data (in a real app, you would fetch this from a database)
@@ -42,40 +40,65 @@ class BookingController extends Controller
                 'notes' => '2 rooms, 10 guests',
             ],
         ];
-        
+
         return view('pages.bookings', compact('bookings'));
     }
-    
-    //Create a new booking from a property
-     
+
+    // Create a new booking request from a property
     public function book($property_id)
     {
-        return redirect()->route('bookings.index')->with('success', 'Booking created successfully!');
+        $property = $this->getPropertyById($property_id);
+        return view('pages.request-booking', compact('property'));
     }
-    
+
+    // Process the final booking request
+    public function processBooking(Request $request, $property_id)
+    {
+        // In a real app, you would save the booking details to the database
+        // For now, simply redirect to the bookings page
+        return redirect()->route('bookings.index');
+    }
+
+    // Cancel a booking request (go back to property page)
+    public function cancelRequest($property_id)
+    {
+        // Simply redirect back to property details
+        return redirect()->route('property.show', $property_id);
+    }
+
     // Show booking details
-    
     public function show($id)
     {
         // In a real app, you would fetch a specific booking
         return redirect()->route('bookings.index');
     }
-    
+
+    // Cancel a booking
     public function cancel($id)
     {
         // In a real app, you would cancel the booking in the database
-        return redirect()->route('bookings.index')->with('success', 'Booking cancelled successfully!');
+        return redirect()->route('bookings.index');
     }
 
-    public function getBookingById($id){
-        $booking = Booking::find($id);
-        if($booking){
-            return response()->json(["message" => "Successfully fetched data","data" => $booking], 200);
-        }
-        return response()->json(["message" => "ID doesnt exist"], 404);
-    }
-    public function updateBooking($id, Request $request){
-        $booking = Booking::find($id);
-        $booking->update($request->all());
+    // Helper method to get property data
+    private function getPropertyById($id)
+    {
+        // In a real app, this would be from the database
+        return [
+            'id' => $id,
+            'name' => 'Limosnero\'s Private House',
+            'location' => 'Minglanilla, Cebu',
+            'cost_per_night' => 1900,
+            'rating' => 4.9,
+            'images' => [
+                'main' => 'assets/images/HOUSE (1).png',
+                'gallery' => [
+                    'assets/images/HOUSE (2).png',
+                    'assets/images/HOUSE (3).png',
+                    'assets/images/HOUSE (4).png',
+                    'assets/images/HOUSE (5).png',
+                ]
+            ],
+        ];
     }
 }

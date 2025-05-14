@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +15,7 @@ class UserController extends Controller
     {
         return view('pages.login');
     }
+
     public function showSignUp()
     {
         return view('pages.signup');
@@ -28,58 +28,49 @@ class UserController extends Controller
         $user = User::find($id);
         return validateData($user, "fetched");
     }
-    public function createUser(Request $request){
+    public function createUser(Request $request)
+    {
+        // Check if user with the same email already exists
         if (User::where('user_email', $request->user_email)->exists()) {
-            return response()->json(["message" => "User email already exists"], 409);
-        }
-        if (User::where('user_contact_number', $request->user_contact_number)->exists()) {
-            return response()->json(["message" => "Number already exists"], 409);
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(["message" => "Email Address already exists"], 409);
+            }
+            return back()->with('error', 'Email Address already exists');
         }
 
         // Validate the input data
         $validated = $request->validate([
-            'user_name' => 'required|string|max:50',
-            'user_contact_number' => 'required|string|max:11',
-            'user_email' => 'required|email|max:50',
-            'user_password' => 'required|string|max:100',
-            'user_date_created' => 'required|date',
-            'user_profile' => 'nullable|string|max:250',
-            'user_is_guest'=> 'required|boolean',
-            'user_is_host'=> 'required|boolean'
+            'user_fname' => 'required|string|max:50',
+            'user_lname' => 'required|string|max:50',
+            'user_contact_number' => 'required|string|max:11|unique:users,user_contact_number',
+            'user_email' => 'required|string|email|max:50|unique:users,user_email',
+            'user_password' => 'required|string|min:6|max:100',
         ]);
 
         // Hash the password
-        $validated['user_password'] = Hash::make($request->user_password);
+        $validated['user_password'] = Hash::make($validated['user_password']);
 
         // Create the user
-        $result = User::create($validated);
-
-        // Return the success response
-        return validateData($result, "created");
-    }
-    public function updateUser(Request $request, $id){
-        $user = User::find($id);
-        validateData($user, "fetched");
-
-        $validated = $request->validate([
-            'user_name' => 'required|string|max:50',
-            'user_contact_number' => 'required|string|max:11',
-            'user_email' => 'required|email|max:50',
-            'user_password' => 'required|string|max:100',
-            'user_date_created' => 'required|date',
-            'user_profile' => 'nullable|string|max:250',
-            'user_is_guest'=> 'required|boolean',
-            'user_is_host'=> 'required|boolean'
+        $result = User::create([
+            'user_fname' => $validated['user_fname'],
+            'user_lname' => $validated['user_lname'],
+            'user_contact_number' => $validated['user_contact_number'],
+            'user_email' => $validated['user_email'],
+            'user_password' => $validated['user_password'],
+            'user_date_created' => now(),
         ]);
 
-        if($user->user_email !== $request->user_email){
-            if(User::where('user_email',$request->user_email)->exists()){
-                return response()->json(["message" => "User email already exists"],404);
-            }
+        // Return the success response
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Registration successful! Redirecting to login...",
+                "redirect" => route('login')
+            ]);
         }
-        $user->update($validated);
-        return response()->json(["message" => "User updated successfully"],200);
+        return redirect()->route('login')->with('success', 'User created successfully!');
     }
+
     public function deleteUser($id){
         $user = User::find($id);
         if(!$user){

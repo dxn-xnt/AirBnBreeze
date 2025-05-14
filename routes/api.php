@@ -21,3 +21,5 @@ Route::get('/User', [UserController::class,'getAllUser']);
 Route::get('/User/{id}', [UserController::class,'getUserById']);
 Route::put('/User/{id}', [UserController::class,'updateUser']);
 Route::delete('/User/{id}', [UserController::class,'deleteUser']);
+
+Route::get('/Type', [PropertyController::class,'getAllProperty']);

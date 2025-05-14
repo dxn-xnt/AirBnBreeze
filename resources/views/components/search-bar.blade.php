@@ -1,46 +1,71 @@
-<div class="relative z-10 w-full">
-    <div class="flex bg-airbnb-light rounded-full py-2 px-3 shadow-[0_15px_10px_-10px_rgba(0,0,0,0.5)] justify-between items-center max-w-[1350px] mx-auto">
-        <!-- Location -->
-        <div class="px-4 border-r border-[#383131] flex-1">
-            <label class="block text-sm mb-0.5 text-[#6e7672]">Place Location</label>
-            <div class="flex items-center gap-2">
-                <i class="w-7 h-7 text-airbnb-darkest" data-lucide="map-pin"></i>
-                <input type="text" placeholder="Cebu City, Cebu" class="input-field text-xl font-medium">
-            </div>
+<div class="w-full max-w-[1400px] mx-auto px-4 z-10 relative">
+  <div style="filter: drop-shadow(0px 8px 10px rgba(0, 0, 0, 0.3));" class="overflow-visible">
+    <!-- horizontal scroll on mobile -->
+    <div class="bg-airbnb-light flex items-center w-full rounded-full overflow-x-auto md:overflow-hidden min-w-[300px] md:min-w-[600px] scrollbar-hide">
+      <!-- Place Location -->
+      <div class="flex-shrink-0 flex-1 border-r border-gray-900 py-1 px-2 mx-3 my-2 min-h-[50px] min-w-[180px]">
+        <div class="text-sm text-[#6e7672] mb-1">Place Location</div>
+        <div class="flex items-center gap-1">
+          <i class="w-6 h-6 text-airbnb-dark" data-lucide="map-pin"></i>
+            <input type="text" value="Cebu City" class="input-field text-xl font-medium text-airbnb-darkest">
         </div>
-        
-        <!-- Arrival Date -->
-        <div class="px-4 border-r border-[#383131] flex-1">
-            <label class="block text-sm mb-0.5 text-[#6e7672]">Arrival Date</label>
-            <div class="flex items-center gap-2">
-                <i class="w-7 h-7 text-airbnb-darkest" data-lucide="calendar"></i>
-                <input type="text" value="24/06/25" class="input-field text-xl font-semibold">
-            </div>
+      </div>
+
+      <!-- Arrival Date -->
+      <div class="flex-shrink-0 flex-1 border-r border-gray-900 py-1 px-2 min-h-[50px] min-w-[150px]">
+        <div class="text-sm text-[#6e7672] mb-1">Arrival Date</div>
+        <div class="flex items-center gap-2">
+            <input
+                type="date"
+                class="input-field text-xl font-medium text-airbnb-darkest"
+                min="<?php echo date('Y-m-d'); ?>"
+                value="<?php echo date('Y-m-d'); ?>"
+            >
         </div>
-        
-        <!-- Departure Date -->
-        <div class="px-4 border-r border-[#383131] flex-1">
-            <label class="block text-sm mb-0.5 text-[#6e7672]">Departure Date</label>
-            <div class="flex items-center gap-2">
-                <i class="w-7 h-7 text-airbnb-darkest" data-lucide="calendar"></i>
-                <input type="text" value="24/06/25" class="input-field text-xl font-semibold">
-            </div>
+      </div>
+
+      <!-- Departure Date -->
+      <div class="flex-shrink-0 flex-1 border-r border-gray-900 py-1 px-2 min-h-[50px] min-w-[150px]">
+        <div class="text-sm text-[#6e7672] mb-1">Departure Date</div>
+        <div class="flex items-center gap-2">
+            <input
+                type="date"
+                class="input-field text-xl font-medium text-airbnb-darkest"
+                min="<?php echo date('Y-m-d'); ?>"
+                value="<?php echo date('Y-m-d'); ?>"
+            >
         </div>
-        
-        <!-- Room & Guests -->
-        <div class="px-4 border-r border-[#383131] flex-1">
-            <label class="block text-sm mb-0.5 text-[#6e7672]">Room & Guests</label>
-            <div class="flex items-center gap-2">
-                <i class="w-7 h-7 text-airbnb-darkest" data-lucide="door-open"></i>
-                <input type="text" value="2" class="w-[30px] text-center bg-transparent border-none outline-none text-xl font-semibold mr-[10px]">
-                <i class="w-7 h-7 text-airbnb-darkest" data-lucide="users"></i>
-                <input type="text" value="5" class="w-[30px] text-center bg-transparent border-none outline-none text-xl font-semibold mr-[10px]">
-            </div>
-        </div>
-        
-        <!-- Search Button -->
-        <button class="bg-airbnb-darkest text-airbnb-light border-none py-3 px-6 rounded-full text-lg font-medium cursor-pointer ml-[10px] min-w-[150px]">
-            Search
+      </div>
+
+      <!-- Room & Guest -->
+      <div class="flex-shrink-0 flex-1 border-r border-gray-900 py-1 px-2 min-h-[50px] min-w-[150px]">
+        <div class="text-sm text-[#6e7672] mb-1">Room & Guest</div>
+          <div class="flex items-center gap-2">
+              <i class="w-6 h-6 text-housify-darkest" data-lucide="door-open"></i>
+              <input type="text" value="2" class="w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium">
+              <i class="w-6 h-6 text-housify-darkest" data-lucide="users"></i>
+              <input type="text" value="5" class="w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium">
+          </div>
+      </div>
+
+      <!-- Search Button -->
+      <div class="flex-shrink-0 bg-airbnb-darkest flex items-center justify-center py-1 px-6 md:px-12 rounded-full mx-3 my-2 min-h-[50px]">
+        <button class="text-airbnb-light text-base font-medium w-full h-full whitespace-nowrap">
+          Search
         </button>
+      </div>
     </div>
+  </div>
 </div>
+
+@push('styles')
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+@endpush

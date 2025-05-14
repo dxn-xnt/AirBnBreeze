@@ -12,7 +12,11 @@ class TypeController extends Controller
      */
     public function index()
     {
-        //
+        // Fetch all types with their names and icons
+        $types = Type::select('type_id', 'type_name', 'icon_name')->get();
+
+        // Pass the data to the view (if needed)
+        return view('types.index', compact('types'));
     }
 
     /**
@@ -20,7 +24,8 @@ class TypeController extends Controller
      */
     public function create()
     {
-        //
+        // Return the form view for creating a new type
+        return view('types.create');
     }
 
     /**
@@ -28,7 +33,18 @@ class TypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'type_name' => 'required|string|max:255',
+            'icon_name' => 'required|string|max:255', // Ensure icon_name is validated
+        ]);
+
+        // Create a new type record
+        Type::create($validated);
+
+        // Redirect to the index page with a success message
+        return redirect()->route('type.index')
+            ->with('success', 'Type created successfully!');
     }
 
     /**
@@ -36,7 +52,15 @@ class TypeController extends Controller
      */
     public function show(Type $type)
     {
-        //
+        // Fetch the specific type with its name and icon
+        $typeData = [
+            'type_id' => $type->type_id,
+            'type_name' => $type->type_name,
+            'icon_name' => $type->icon_name,
+        ];
+
+        // Pass the data to the view
+        return view('types.show', ['type' => $typeData]);
     }
 
     /**
@@ -44,7 +68,8 @@ class TypeController extends Controller
      */
     public function edit(Type $type)
     {
-        //
+        // Pass the type data to the edit form view
+        return view('types.edit', compact('type'));
     }
 
     /**
@@ -52,7 +77,18 @@ class TypeController extends Controller
      */
     public function update(Request $request, Type $type)
     {
-        //
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'type_name' => 'required|string|max:255',
+            'icon_name' => 'required|string|max:255', // Ensure icon_name is validated
+        ]);
+
+        // Update the type record
+        $type->update($validated);
+
+        // Redirect to the index page with a success message
+        return redirect()->route('type.index')
+            ->with('success', 'Type updated successfully!');
     }
 
     /**
@@ -60,6 +96,11 @@ class TypeController extends Controller
      */
     public function destroy(Type $type)
     {
-        //
+        // Delete the type record
+        $type->delete();
+
+        // Redirect to the index page with a success message
+        return redirect()->route('type.index')
+            ->with('success', 'Type deleted successfully!');
     }
 }
