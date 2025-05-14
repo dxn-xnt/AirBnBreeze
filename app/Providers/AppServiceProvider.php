@@ -2,23 +2,32 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * The policy mappings for the application.
+     *
+     * @var array
      */
-    public function register(): void
-    {
-        //
-    }
+    protected $policies = [
+        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+    ];
 
     /**
-     * Bootstrap any application services.
+     * Register any authentication / authorization services.
      */
     public function boot(): void
     {
-        //
+        $this->registerPolicies();
+
+        // Ensure Sanctum is properly configured
+        if (!class_exists(Sanctum::class)) {
+            throw new \RuntimeException('Sanctum is not installed. Run "composer require laravel/sanctum" to install it.');
+        }
+
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
     }
 }

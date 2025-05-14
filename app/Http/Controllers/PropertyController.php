@@ -2,69 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Amenity;
+use App\Models\Property;
+use App\Models\Type;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AmenityController;
 
 class PropertyController extends Controller
 {
     public function index()
     {
-        $properties = [
-            [
-                'id' => 1,
-                'name' => 'Limosnero\'s Private House',
-                'location' => 'Minglanilla, Cebu',
-                'price' => 1900,
-                'rating' => 4.9,
-                'image' => 'assets/images/HOUSE (1).png',
-                'is_favorite' => true
-            ],
-            [
-                'id' => 2,
-                'name' => 'Limosnero\'s Private House',
-                'location' => 'Mactan, Cebu',
-                'price' => 2500,
-                'rating' => 4.7,
-                'image' => 'assets/images/HOUSE (2).png',
-                'is_favorite' => false
-            ],
-            [
-                'id' => 3,
-                'name' => 'Limosnero\'s Private House',
-                'location' => 'Busay, Cebu',
-                'price' => 1750,
-                'rating' => 4.8,
-                'image' => 'assets/images/HOUSE (3).png',
-                'is_favorite' => false
-            ],
-            [
-                'id' => 4,
-                'name' => 'Downtown Apartment',
-                'location' => 'Cebu City, Cebu',
-                'price' => 1550,
-                'rating' => 4.6,
-                'image' => 'assets/images/HOUSE (4).png',
-                'is_favorite' => true
-            ],
-            [
-                'id' => 5,
-                'name' => 'Garden Cottage',
-                'location' => 'Liloan, Cebu',
-                'price' => 1800,
-                'rating' => 4.9,
-                'image' => 'assets/images/HOUSE (6).png',
-                'is_favorite' => false
-            ],
-            [
-                'id' => 6,
-                'name' => 'Modern Condo',
-                'location' => 'IT Park, Cebu',
-                'price' => 2200,
-                'rating' => 4.8,
-                'image' => 'assets/images/HOUSE (7).png',
-                'is_favorite' => false
-            ],
-        ];
-
+        $properties = Property::All();
         return view('pages.home', compact('properties'));
     }
 
@@ -74,7 +22,7 @@ class PropertyController extends Controller
     {
         $property = [
             'id' => $id,
-            'name' => 'Limosnero\'s Private House',
+            'title' => 'Limosnero\'s Private House',
             'location' => 'Minglanilla, Cebu, Philippines',
             'guests' => 5,
             'rooms' => 2,
@@ -131,4 +79,6 @@ class PropertyController extends Controller
 
         return view('pages.property-details', compact('property'));
     }
+
+
 }

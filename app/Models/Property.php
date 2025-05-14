@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +8,7 @@ class Property extends Model
     protected $table = 'property';
     protected $primaryKey = 'prop_id';
     protected $fillable = [
+        'prop_type',
         'prop_title',
         'prop_description',
         'prop_price_per_night',
@@ -18,9 +18,16 @@ class Property extends Model
         'prop_status',
         'prop_address',
         'prop_date_created',
-        'user_host_id'
+        'user_id'
     ];
-    public function user(){
-        return $this->belongsTo(User::class,'user_id');
+
+    public function host()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function amenities()
+    {
+        return $this->hasMany(PropertyAmenity::class, 'prop_id');
     }
 }

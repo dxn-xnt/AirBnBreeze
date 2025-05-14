@@ -2,17 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PropertyAmenity extends Model
 {
-    protected $table = 'property_amenity';
-    protected $primaryKey = 'prop_id';
+    use HasFactory;
+
+    protected $table = 'property_amenities';
+
     protected $fillable = [
+        'prop_id',
         'amn_id'
     ];
-    public function amenity(){
-        return $this->belongsTo(Amenity::class,'amn_id');
+
+    // Define relationship to Property
+    public function property()
+    {
+        return $this->belongsTo(Property::class, 'prop_id');
     }
-    public $timestamps = false;
 }
