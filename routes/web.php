@@ -9,7 +9,7 @@ use App\Http\Controllers\NotificationController;
 
 // Public Property Views
 Route::get('/', [PropertyController::class, 'index'])->name('home');
-Route::get('/property/', [PropertyController::class, 'show'])->name('property.show');
+Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
 
 // Public Routes
 Route::middleware(['guest'])->group(function () {

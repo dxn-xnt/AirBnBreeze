@@ -1,16 +1,13 @@
 @extends('layouts.app')
 
-
 @section('title', 'Home')
 
-
 @section('content')
-    <!-- Home -->
-    <div class="h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden relative mt-8 md:mt-[39px] max-w-[1750px] mx-auto">
+    <!-- Home Section -->
+    <div class="h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden relative mt-8 md:mt-[39px] max-w-[px] mx-auto">
         <img src="{{ asset('assets/images/airbnbreeze-bg.jpg') }}" alt="AirBnBreeze"
              class="h-full w-full object-cover object-center block">
     </div>
-
 
     <!-- Main Content -->
     <div class="relative w-full mt-[-50px] sm:mt-[-75px] md:mt-[-100px]">
@@ -18,7 +15,6 @@
         <section class="mb-5 relative z-10 w-full px-4 sm:px-6 lg:px-8">
             <x-search-bar />
         </section>
-
 
         <!-- Filters Section -->
         <section class="relative mb-8 md:mb-10 z-[5] w-full">
@@ -36,16 +32,14 @@
             </div>
         </section>
 
-
-<!-- Listings Section - Optimized 3-column max -->
-<section class="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 sm:gap-x-8 lg:gap-x-9 gap-y-8 sm:gap-y-10 lg:gap-y-12 mb-8 max-w-[1750px] mx-auto">
-        @foreach($properties as $property)
-            <x-property-card :property="$property" />
-        @endforeach
-    </div>
-</section>
-
+        <!-- Listings Section - Optimized 3-column max -->
+        <section class="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 sm:gap-x-8 lg:gap-x-9 gap-y-8 sm:gap-y-10 lg:gap-y-12 mb-8 max-w-[1750px] mx-auto">
+                @foreach($properties as $property)
+                    <x-property-card :property="$property" />
+                @endforeach
+            </div>
+        </section>
 
         <!-- Explore More Section -->
         <div class="text-center py-4 pb-6 md:pb-8 max-w-[1200px] mx-auto px-4 sm:px-6">
@@ -56,61 +50,58 @@
         </div>
     </div>
 
-<!-- Footer Section - Directly Inserted -->
-<footer class="bg-airbnb-dark text-airbnb-light py-4 sm:py-5 px-4 sm:px-6 md:px-8 w-full">
-    <div class="flex flex-col sm:flex-row justify-between items-center max-w-[1750px] mx-auto gap-4 sm:gap-0">
-        <!-- Footer Logo -->
-        <div class="flex items-center gap-2 sm:mr-0">
-            <img src="{{ asset('assets/images/air-logo.png') }}" alt="AirBnBreeze Logo" class="h-8 w-8 sm:h-[50px] sm:w-[50px] border border-airbnb-light rounded-full object-cover">
-            <span class="font-righteous text-xl sm:text-[28px] text-airbnb-light">AirBnBreeze</span>
+    <!-- Footer Section - Directly Inserted -->
+    <footer class="bg-airbnb-dark text-airbnb-light py-4 sm:py-5 px-4 sm:px-6 md:px-8 w-full">
+        <div class="flex flex-col sm:flex-row justify-between items-center max-w-[1750px] mx-auto gap-4 sm:gap-0">
+            <!-- Footer Logo -->
+            <div class="flex items-center gap-2 sm:mr-0">
+                <img src="{{ asset('assets/images/air-logo.png') }}" alt="AirBnBreeze Logo" class="h-8 w-8 sm:h-[50px] sm:w-[50px] border border-airbnb-light rounded-full object-cover">
+                <span class="font-righteous text-xl sm:text-[28px] text-airbnb-light">AirBnBreeze</span>
+            </div>
+
+            <!-- Footer Links -->
+            <div class="flex flex-wrap items-center justify-center sm:justify-center gap-4 sm:gap-8 w-full sm:w-auto">
+                <a href="{{ route('about') }}" class="text-airbnb-light hover:underline text-sm sm:text-base">About Us</a>
+                <span class="text-airbnb-light text-sm hidden sm:inline">•</span>
+                <a href="#" class="text-airbnb-light hover:underline text-sm sm:text-base">Browse</a>
+                <span class="text-airbnb-light text-sm hidden sm:inline">•</span>
+                <a href="#" class="text-airbnb-light hover:underline text-sm sm:text-base">AirBnB Your Home</a>
+            </div>
+
+            <!-- Social Links -->
+            <div class="flex gap-4 sm:ml-0">
+                <a href="#" class="text-airbnb-light hover:text-white">
+                    <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="facebook"></i>
+                </a>
+                <a href="#" class="text-airbnb-light hover:text-white">
+                    <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="github"></i>
+                </a>
+                <a href="#" class="text-airbnb-light hover:text-white">
+                    <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="instagram"></i>
+                </a>
+            </div>
         </div>
-       
-        <!-- Footer Links -->
-        <div class="flex flex-wrap items-center justify-center sm:justify-center gap-4 sm:gap-8 w-full sm:w-auto">
-            <a href="{{ route('about') }}" class="text-airbnb-light hover:underline text-sm sm:text-base">About Us</a>
-            <span class="text-airbnb-light text-sm hidden sm:inline">•</span>
-            <a href="#" class="text-airbnb-light hover:underline text-sm sm:text-base">Browse</a>
-            <span class="text-airbnb-light text-sm hidden sm:inline">•</span>
-            <a href="#" class="text-airbnb-light hover:underline text-sm sm:text-base">AirBnB Your Home</a>
-        </div>
-       
-        <!-- Social Links -->
-        <div class="flex gap-4 sm:ml-0">
-            <a href="#" class="text-airbnb-light hover:text-white">
-                <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="facebook"></i>
-            </a>
-            <a href="#" class="text-airbnb-light hover:text-white">
-                <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="github"></i>
-            </a>
-            <a href="#" class="text-airbnb-light hover:text-white">
-                <i class="w-5 h-5 sm:w-6 sm:h-6" data-lucide="instagram"></i>
-            </a>
-        </div>
-    </div>
-</footer>
+    </footer>
 @endsection
 
-
 @push('styles')
-<style>
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-
-
-    .custom-green-gradient {
-        background-image: linear-gradient(to bottom, rgba(55, 85, 52, 0.1) 0%, #375534 40%);
-    }
-
-
-    @media (max-width: 640px) {
-        .filter-scroll-container {
-            padding-bottom: 8px;
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
         }
-    }
-</style>
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .custom-green-gradient {
+            background-image: linear-gradient(to bottom, rgba(55, 85, 52, 0.1) 0%, #375534 40%);
+        }
+
+        @media (max-width: 640px) {
+            .filter-scroll-container {
+                padding-bottom: 8px;
+            }
+        }
+    </style>
 @endpush
