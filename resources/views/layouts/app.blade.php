@@ -25,10 +25,13 @@
 <body class="font-montserrat">
 <!-- Header (includes sticky search bar functionality) -->
 
-@if(!\Request::is('bookings*'))
+@if(\Request::is('host*'))
+    <x-layout.host-header />      
+@elseif(!\Request::is('bookings*'))
     <x-layout.header />
+@else
+    <x-layout.bookings-header />
 @endif
-
 <!-- Page Content -->
 <main>
     @yield('content')

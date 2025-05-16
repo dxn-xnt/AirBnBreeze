@@ -3,7 +3,6 @@
 @section('title', 'Login')
 
 @section('content')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="flex items-center justify-center h-screen">
         <div x-data="{ form: 'login' }"
              class="bg-airbnb-light p-6 rounded-xl border-[1px] border-airbnb-darkest shadow-md w-full max-w-sm text-sm text-airbnb-darkest font-medium mx-auto">
@@ -18,42 +17,13 @@
                     @csrf
                     <input type="text" name="user_email" placeholder="Email Address"
                            class="w-full px-4 py-2 mb-3 rounded-md border border-airbnb-darkest bg-airbnb-light text-airbnb-darkest placeholder-airbnb-dark focus:outline-none">
-                    @if ($errors->has('user_email'))
-                        <p class="text-red-500 text-xs">{{ $errors->first('user_email') }}</p>
-                    @endif
                     <input type="password" name="user_password" placeholder="Password"
-                           class="w-full px-4 py-2 mb-3 rounded-md border border-airbnb-darkest bg-airbnb-light text-airbnb-darkest placeholder-airbnb-dark focus:outline-none">
-                    @if ($errors->has('user_password'))
-                        <p class="text-red-500 text-xs">{{ $errors->first('user_password') }}</p>
+                           class="w-full px-4 py-2 rounded-md border border-airbnb-darkest bg-airbnb-light text-airbnb-darkest placeholder-airbnb-dark focus:outline-none">
+                    @if ($errors->has('user_email'))
+                        <p class="text-red-500 text-xs mt-1">Account does not exist</p>
                     @endif
-                    <button class="bg-airbnb-dark text-airbnb-light w-full py-2 rounded-md font-semibold">LOG IN</button>
+                    <button class="bg-airbnb-dark text-airbnb-light w-full mt-3 py-2 rounded-md font-semibold">LOG IN</button>
                 </form>
-
-                @if ($errors->any())
-                    <script>
-                        // Display error messages using SweetAlert
-                        @foreach ($errors->all() as $error)
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: "{{ addslashes($error) }}",
-                        });
-                        @endforeach
-                    </script>
-                @endif
-
-                @if (session('success'))
-                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                    <script>
-                        // Display success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: "{{ addslashes(session('success')) }}",
-                        });
-                    </script>
-                @endif
-
 
                 <div class="flex justify-end mt-1 text-xs underline cursor-pointer" @click="form = 'forgot'">Forgot
                     password?</div>
@@ -88,10 +58,10 @@
                 </div>
 
                 <div class="text-center space-y-2">
-                    <button @click="form = 'login'"
+                    <button onclick="window.location.href='{{ route('login') }}'"
                             class="w-full border border-airbnb-darkest py-2 rounded-sm font-semibold text-airbnb-darkest">Back to LOG
                         IN</button>
-                    <button @click="form = 'signup'"
+                    <button onclick="window.location.href='{{ route('signup') }}'"
                             class="w-full border border-airbnb-darkest py-2 rounded-sm font-semibold text-airbnb-darkest">Go to SIGN
                         UP</button>
                 </div>
