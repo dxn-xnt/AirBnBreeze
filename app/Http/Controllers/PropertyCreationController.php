@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenity;
 use App\Models\Type;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Property;
 use App\Models\PropertyImage;
@@ -305,6 +306,10 @@ class PropertyCreationController extends Controller
                     'img_url' => $imagePath,
                 ]);
             }
+
+            $user = User::find(auth()->id());
+            $user->user_is_host = True;
+            $user->save();
 
             \DB::commit();
 

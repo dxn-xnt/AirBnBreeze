@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('user_password');
             $table->date('user_date_created');
             $table->string('user_profile')->nullable();
+            $table->boolean('user_is_host')->default(false);
         });
     }
 

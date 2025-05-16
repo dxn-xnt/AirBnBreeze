@@ -5,10 +5,24 @@
         <span class="font-righteous text-xl sm:text-[28px] font-normal text-airbnb-light">AirBnBreeze</span>
     </a>
 
-    <nav class="flex space-x-7">
-        <a href="index.html" class="font-medium text-white/90">Calendar</a>
-        <a href="properties.html" class="font-semibold underline">Properties</a>
-        <a href="#" class="font-medium text-white/90">Bookings</a>
+    <nav class="flex space-x-10">
+        <!-- Properties Link -->
+        <a href="{{ route('host.listing') }}"
+           class="text-xl relative py-2 transition-all duration-300 text-airbnb-light
+              {{ request()->routeIs('host.listing')
+                 ? 'font-semibold scale-110'
+                 : 'font-regular' }}">
+            Properties
+        </a>
+
+        <!-- Bookings Link -->
+        <a href="{{ route('host.bookings') }}"
+           class="text-xl relative py-2 transition-all duration-300 text-airbnb-light
+              {{ request()->routeIs('host.bookings')
+                 ? 'font-semibold scale-110'
+                 : 'font-regular' }}">
+            Bookings
+        </a>
     </nav>
 
     <!-- Menu with Alpine.js -->

@@ -125,10 +125,10 @@
                 </div>
                 x`
                 <div class="text-center space-y-2">
-                    <button @click="form = 'login'"
+                    <button onclick="window.location.href='{{ route('login') }}'"
                             class="w-full border border-airbnb-darkest py-2 rounded-md font-semibold text-airbnb-darkest">Back to LOG
                         IN</button>
-                    <button @click="form = 'signup'"
+                    <button onclick="window.location.href='{{ route('signup') }}'"
                             class="w-full border border-airbnb-darkest py-2 rounded-md font-semibold text-airbnb-darkest">Go to SIGN
                         UP</button>
                 </div>

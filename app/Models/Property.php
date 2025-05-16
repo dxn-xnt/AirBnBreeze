@@ -21,6 +21,11 @@ class Property extends Model
         'user_id'
     ];
 
+    public function images()
+    {
+        return $this->hasMany(Images::class, 'prop_id');
+    }
+
     public function host()
     {
         return $this->belongsTo(User::class, 'user_id');
