@@ -21,16 +21,20 @@
             <!-- Gallery Images (Right Column) -->
             <div class="flex-1 grid grid-cols-2 gap-3 sm:gap-4">
                 @foreach($data['images']['gallery'] as $key => $image)
-                    <div class="relative">
-                        <img src="{{ asset('storage/' . $image) }}"
-                             alt="Gallery view {{ $key + 1 }}"
-                             class="w-full h-[140px] sm:h-[160px] md:h-[190px] object-cover rounded-xl sm:rounded-2xl border border-airbnb-darkest shadow-md">
-                        @if($key === 3)
-                            <span class="absolute bottom-2 sm:bottom-[10px] right-2 sm:right-[10px] bg-airbnb-light text-airbnb-darkest py-1 px-2 sm:px-2.5 rounded-xl sm:rounded-2xl text-xs font-semibold cursor-pointer">
-                    Show All Photos
-                </span>
-                        @endif
-                    </div>
+                    @if($key > 0) <!-- Skip the first image (index 0) -->
+                        <div class="relative">
+                            <img src="{{ asset('storage/' . $image) }}"
+                                alt="Gallery view {{ $key + 1 }}"
+                                class="w-full h-[140px] sm:h-[160px] md:h-[190px] object-cover rounded-xl sm:rounded-2xl border border-airbnb-darkest shadow-md">
+                            @if($key === count($data['images']['gallery']) - 1)
+                                <span id="showAllPhotosButton"
+                                    onclick="openPhotoModal()"
+                                    class="absolute bottom-2 sm:bottom-[10px] right-2 sm:right-[10px] bg-airbnb-light text-airbnb-darkest py-1 px-2 sm:px-2.5 rounded-xl sm:rounded-2xl text-xs font-semibold cursor-pointer">
+                                    Show All Photos
+                                </span>
+                           @endif
+                        </div>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -144,6 +148,194 @@
             </div>
         </div>
     </div>
+
+    <!-- Photo Modal with Enhanced Design -->
+    <div id="photoModal" class="fixed inset-0 hidden bg-black bg-opacity-80 z-50 flex items-center justify-center">
+        <!-- Close Button (X) at top right of screen, not modal -->
+        <button id="closeModal" class="absolute top-6 right-6 text-white text-4xl font-light hover:text-gray-300 focus:outline-none z-[60]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Modal Container -->
+        <div class="relative w-full h-full flex items-center justify-center">
+            <!-- Navigation Arrows -->
+            <button id="prevArrow" class="absolute left-4 md:left-10 z-[55] bg-airbnb-light hover:bg-opacity-70 text-airbnb-darkest p-3 rounded-full focus:outline-none transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <button id="nextArrow" class="absolute right-4 md:right-10 z-[55] bg-airbnb-light hover:bg-opacity-70 text-airbnb-darkest    p-3 rounded-full focus:outline-none transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+
+            <!-- Image Container -->
+            <div class="w-full max-w-7xl px-4">
+                <div class="relative">
+                    <!-- Carousel Images Container -->
+                    <div id="carouselImagesContainer" class="w-full flex justify-center items-center overflow-hidden">
+                        <div id="carouselImages" class="flex transition-transform duration-300">
+                            @foreach($data['images']['gallery'] as $index => $image)
+                                <div class="carousel-item w-full flex-shrink-0 px-4 flex items-center justify-center" data-index="{{ $index }}">
+                                    <img
+                                        src="{{ asset('storage/' . $image) }}"
+                                        alt="Property Image {{ $index + 1 }}"
+                                        class="max-h-[80vh] max-w-full object-cover rounded-xl sm:rounded-2xl border border-airbnb-darkest shadow-md">"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicator dots at bottom center of screen (no counter) -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[60] flex flex-col items-center gap-3">
+        <!-- Indicator Dots -->
+        <div id="indicatorDots" class="flex gap-2 hidden">
+            @foreach($data['images']['gallery'] as $index => $image)
+                <button
+                    class="w-2 h-2 rounded-full transition-all duration-200 dot-indicator"
+                    data-index="{{ $index }}"
+                    aria-label="Go to image {{ $index + 1 }}"
+                ></button>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- Scripts for the carousel -->
+    <script>
+        // DOM Elements
+        const photoModal = document.getElementById('photoModal');
+        const carouselImages = document.getElementById('carouselImages');
+        const prevArrow = document.getElementById('prevArrow');
+        const nextArrow = document.getElementById('nextArrow');
+        const closeModalBtn = document.getElementById('closeModal');
+        const carouselItems = document.querySelectorAll('.carousel-item');
+        const dotIndicators = document.querySelectorAll('.dot-indicator');
+
+        // State
+        let currentIndex = 0;
+        let totalImages = carouselItems.length;
+
+        // Function to close the photo modal
+        function closePhotoModal() {
+            photoModal.classList.add('hidden');
+            photoModal.classList.remove('flex');
+            document.body.style.overflow = ''; // Restore scrolling
+
+            // Hide the indicator dots
+            const indicatorDots = document.getElementById('indicatorDots');
+            indicatorDots.classList.add('hidden');
+        }
+
+        // Function to open the photo modal
+        function openPhotoModal(startIndex = 0) {
+            photoModal.classList.remove('hidden');
+            photoModal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            setCurrentImage(startIndex);
+
+            // Show the indicator dots
+            const indicatorDots = document.getElementById('indicatorDots');
+            indicatorDots.classList.remove('hidden');
+        }
+
+        // Update dot indicators
+        function updateDotIndicators() {
+            dotIndicators.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.add('bg-white');
+                    dot.classList.remove('bg-gray-500', 'opacity-50');
+                } else {
+                    dot.classList.add('bg-gray-500', 'opacity-50');
+                    dot.classList.remove('bg-white');
+                }
+            });
+        }
+
+        // Set current image in the carousel
+        function setCurrentImage(index) {
+            currentIndex = index;
+            updateCarouselPosition();
+            updateArrowVisibility();
+            updateDotIndicators();
+        }
+
+        // Update carousel position based on current index
+        function updateCarouselPosition() {
+            const translateX = -100 * currentIndex;
+            carouselImages.style.transform = `translateX(${translateX}%)`;
+
+            // Set all items to same width for smooth transition
+            carouselItems.forEach(item => {
+                item.style.width = '100%';
+            });
+        }
+
+        // Update arrow visibility based on position
+        function updateArrowVisibility() {
+            prevArrow.style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+            nextArrow.style.visibility = currentIndex === totalImages - 1 ? 'hidden' : 'visible';
+        }
+
+        // Previous image
+        function showPrevImage() {
+            if (currentIndex > 0) {
+                setCurrentImage(currentIndex - 1);
+            }
+        }
+
+        // Next image
+        function showNextImage() {
+            if (currentIndex < totalImages - 1) {
+                setCurrentImage(currentIndex + 1);
+            }
+        }
+
+        // Event Listeners
+        closeModalBtn.addEventListener('click', closePhotoModal);
+        prevArrow.addEventListener('click', showPrevImage);
+        nextArrow.addEventListener('click', showNextImage);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (photoModal.classList.contains('hidden')) return;
+
+            if (e.key === 'Escape') closePhotoModal();
+            if (e.key === 'ArrowLeft') showPrevImage();
+            if (e.key === 'ArrowRight') showNextImage();
+        });
+
+        // Connect the "Show All Photos" button to the modal
+        document.getElementById('showAllPhotosButton').addEventListener('click', function() {
+            openPhotoModal(0); // Start from the first image
+        });
+
+        // Make individual gallery images clickable to open the modal
+        document.querySelectorAll('.gallery-image').forEach((img, index) => {
+            img.addEventListener('click', function() {
+                openPhotoModal(index);
+            });
+        });
+
+        // Connect dot indicators to navigation
+        dotIndicators.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                setCurrentImage(index);
+            });
+        });
+
+        // Initialize with first slide and update indicators
+        updateArrowVisibility();
+        updateDotIndicators();
+    </script>
 
     @include('components.customer-reviews', ['property' => $data])
     @include('components.view-ownerContact')
