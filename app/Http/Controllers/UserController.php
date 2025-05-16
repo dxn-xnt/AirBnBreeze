@@ -7,26 +7,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        //
-    }
     public function showLogin()
     {
         return view('pages.login');
     }
-
     public function showSignUp()
     {
         return view('pages.signup');
-    }
-    public function getAllUser(){
-        $users = User::all();
-        return validateData($users, "fetched all");
-    }
-    public function getUserById($id){
-        $user = User::find($id);
-        return validateData($user, "fetched");
     }
     public function createUser(Request $request)
     {
@@ -78,6 +65,13 @@ class UserController extends Controller
         }
         $user->delete();
         return response()->json(["message" => "User deleted successfully"],200);
+    }
+
+    public function viewProfile()
+    {
+        return view('pages.profile-view', [
+            'user' => auth()->user()
+        ]);
     }
 
 }

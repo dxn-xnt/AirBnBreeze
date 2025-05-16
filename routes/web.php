@@ -1,4 +1,7 @@
 <?php
+
+use App\Http\Controllers\HostController;
+use App\Http\Controllers\PropertyEditController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
@@ -31,58 +34,53 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::prefix('property/create')->middleware(['auth'])->group(function () {
-    Route::get('/starter', [PropertyCreationController::class, 'createProperty_starter'])
-        ->name('property.create.starter');
-
-    Route::get('/identify-house', [PropertyCreationController::class, 'createProperty_step1'])
-        ->name('property.create');
-
-    Route::post('/identify-house', [PropertyCreationController::class, 'storePropertyType'])
-        ->name('property.store.type');
-
-    Route::get('/location', [PropertyCreationController::class, 'createProperty_step2'])
-        ->name('property.step2');
-
-    Route::post('/location', [PropertyCreationController::class, 'storeLocation'])
-        ->name('property.storeLocation');
-
-    Route::get('/capacity', [PropertyCreationController::class, 'createProperty_step3'])
-        ->name('property.step3');
-
-    Route::post('/capacity', [PropertyCreationController::class, 'storeCapacity'])
-        ->name('property.storeCapacity');
-
-    Route::get('/description', [PropertyCreationController::class, 'createProperty_step4'])
-        ->name('property.step4');
-
-    Route::post('/description', [PropertyCreationController::class, 'storeDescription'])
-        ->name('property.storeDescription');
-
-    Route::get('/amenities', [PropertyCreationController::class, 'createProperty_step5'])
-        ->name('property.step5');
-
-    Route::post('/amenities', [PropertyCreationController::class, 'storeAmenities'])
-        ->name('property.storeAmenities');
-
-    // Route for displaying the pictures form
-    Route::get('/pictures', [PropertyCreationController::class, 'createProperty_step6'])
-        ->name('property.step6');
-
-// Route for storing uploaded images
-    Route::post('/store-pictures', [PropertyCreationController::class, 'storePictures'])
-        ->name('property.storePictures');
+    Route::get('/starter', [PropertyCreationController::class, 'createProperty_starter'])->name('property.create.starter');
+    //Property Type
+    Route::get('/identify-house', [PropertyCreationController::class, 'createProperty_step1'])->name('property.create');
+    Route::post('/identify-house', [PropertyCreationController::class, 'storePropertyType'])->name('property.store.type');
+    //Location
+    Route::get('/location', [PropertyCreationController::class, 'createProperty_step2'])->name('property.step2');
+    Route::post('/location', [PropertyCreationController::class, 'storeLocation'])->name('property.storeLocation');
+    //Capacity
+    Route::get('/capacity', [PropertyCreationController::class, 'createProperty_step3'])->name('property.step3');
+    Route::post('/capacity', [PropertyCreationController::class, 'storeCapacity'])->name('property.storeCapacity');
+    //Title & Description
+    Route::get('/description', [PropertyCreationController::class, 'createProperty_step4'])->name('property.step4');
+    Route::post('/description', [PropertyCreationController::class, 'storeDescription'])->name('property.storeDescription');
+    //Amenities
+    Route::get('/amenities', [PropertyCreationController::class, 'createProperty_step5'])->name('property.step5');
+    Route::post('/amenities', [PropertyCreationController::class, 'storeAmenities'])->name('property.storeAmenities');
+    //Pictures
+    Route::get('/pictures', [PropertyCreationController::class, 'createProperty_step6'])->name('property.step6');
+    Route::post('/store-pictures', [PropertyCreationController::class, 'storePictures'])->name('property.storePictures');
     Route::delete('/property/remove-image/{index}', [PropertyCreationController::class, 'removeImage']);
-// Route for removing an image (if needed)
-    Route::post('/remove-image', [PropertyCreationController::class, 'removeImage'])
-        ->name('property.removeImage');
-
-    Route::get('/price', [PropertyCreationController::class, 'createProperty_step7'])
-        ->name('property.step7');
-
-    Route::post('/property/store-price-and-save', [PropertyCreationController::class, 'storePriceAndSaveProperty'])
-        ->name('property.storePriceAndSave');
+    Route::post('/remove-image', [PropertyCreationController::class, 'removeImage'])->name('property.removeImage');
+    //Price
+    Route::get('/price', [PropertyCreationController::class, 'createProperty_step7'])->name('property.step7');
+    Route::post('/property/store-price-and-save', [PropertyCreationController::class, 'storePriceAndSaveProperty'])->name('property.storePriceAndSave');
 });
 
+Route::prefix('host')->middleware(['auth'])->group(function () {
+    // General host routes
+    Route::get('/listing', [HostController::class, 'viewListing'])->name('host.listing');
+    Route::get('/bookings', [PropertyCreationController::class, 'createProperty_step1'])->name('host.bookings');
+
+    // Property routes group
+    Route::prefix('property/{property}')->group(function () {
+        // Property edit routes group
+        Route::prefix('view-edit')->group(function () {
+            Route::get('/type', [PropertyEditController::class, 'viewEditType'])->name('property.edit.type');
+            Route::get('/location', [PropertyEditController::class, 'viewEditLocation'])->name('property.edit.location');
+            Route::get('/capacity', [PropertyEditController::class, 'viewEditCapacity'])->name('property.edit.capacity');
+            Route::get('/description', [PropertyEditController::class, 'viewEditDescription'])->name('property.edit.description');
+            Route::get('/amenities', [PropertyEditController::class, 'viewEditAmenities'])->name('property.edit.amenities');
+            Route::get('/pictures', [PropertyEditController::class, 'viewEditPictures'])->name('property.edit.pictures');
+            Route::get('/price', [PropertyEditController::class, 'viewEditPrice'])->name('property.edit.price');
+            Route::get('/rules', [PropertyEditController::class, 'viewEditRules'])->name('property.edit.rules');
+        });
+    });
+});
+Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profile.view');
 
 // Request booking process
 Route::get('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');

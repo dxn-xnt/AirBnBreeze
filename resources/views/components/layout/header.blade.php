@@ -31,7 +31,7 @@
                 <!-- Show when logged in -->
                 <div class="px-2 py-1 border-b border-gray-200">
                     <p class="font-medium">Hi, {{ auth()->user()->user_fname }}!</p>
-                    @if(auth()->user()->user_is_host )
+                    @if(auth()->user()->user_is_host)
                         <p class="text-xs text-airbnb-darkest">Host Account</p>
                     @endif
                 </div>
@@ -44,7 +44,7 @@
                 <!-- User/Host specific links -->
                 @if(auth()->user()->user_is_host)
                     <!-- Host-specific menu items -->
-                    <a href="{{ route('bookings.index') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Manage Listing</a>
+                    <a href="{{ route('host.listing') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Manage Listing</a>
                     <a href="{{ route('bookings.index') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Host Bookings</a>
                 @else
                     <!-- Regular user menu items -->

@@ -26,9 +26,9 @@
         <!-- Responsive Image -->
         @if($property->images->isNotEmpty())
             <img
-                src="{{ asset('storage/' . $property->images->first()->img_url) }}"
+                src="{{ $property->images->first() ? asset('storage/' . $property->images->first()->img_url) : asset('images/default-property.jpg') }}"
                 alt="{{ $property->prop_title }}"
-                class="w-full h-[200px] sm:h-[250px] md:h-[290px] object-cover "
+                class="w-full h-[200px] sm:h-[250px] md:h-[290px] object-cover"
             >
         @else
             <img
