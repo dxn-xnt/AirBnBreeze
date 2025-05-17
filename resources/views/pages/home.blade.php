@@ -6,7 +6,7 @@
 
 @section('content')
     <!-- Home -->
-    <div class="h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden relative mt-8 md:mt-[39px] max-w-[1750px] mx-auto">
+    <div class="h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden relative mt-8 md:mt-[39px] max-w-[px] mx-auto">
         <img src="{{ asset('assets/images/airbnbreeze-bg.jpg') }}" alt="AirBnBreeze"
              class="h-full w-full object-cover object-center block">
     </div>

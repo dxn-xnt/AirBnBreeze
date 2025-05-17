@@ -31,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
+    Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
+    Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');
 });
 
 Route::prefix('property/create')->middleware(['auth'])->group(function () {
