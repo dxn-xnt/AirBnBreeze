@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
@@ -47,7 +48,8 @@ class BookingController extends Controller
     // Create a new booking request from a property
     public function book($property_id)
     {
-        $property = $this->getPropertyById($property_id);
+        $property = Property::with(['host', 'images', 'amenities'])->findOrFail($property_id);
+
         return view('pages.request-booking', compact('property'));
     }
 
