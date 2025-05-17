@@ -29,6 +29,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // User Routes
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
+    Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
+    Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');
+});
     Route::view('/favorites', 'pages.Favorites')->name('favorites');
 
     // Booking Routes
