@@ -45,7 +45,7 @@
                 @if(auth()->user()->user_is_host)
                     <!-- Host-specific menu items -->
                     <a href="{{ route('host.listing') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Manage Listing</a>
-                    <a href="{{ route('bookings.index') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Host Bookings</a>
+                    <a href="{{ route('host.bookings.pending') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Host Bookings</a>
                 @else
                     <!-- Regular user menu items -->
                     <a href="{{ route('property.create.starter') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">AirBnB your house</a>

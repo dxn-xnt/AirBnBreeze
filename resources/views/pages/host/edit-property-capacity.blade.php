@@ -37,7 +37,7 @@
                 <div class="px-6 py-8 border-b border-gray-200">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Configure property capacity</h3>
 
-                    <!-- Backrooms Counter -->
+                    <!-- Rooms Counter -->
                     <div class="flex items-center justify-between py-3">
                         <div>
                             <h4 class="text-md font-medium text-gray-700">Rooms</h4>
@@ -48,8 +48,10 @@
                                     <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            <input type="number" name="prop_room_count" id="prop_room_count" value="{{ old('prop_room_count', 1) }}"
-                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none" min="1" step="1">
+                            <input type="number" name="prop_room_count" id="prop_room_count"
+                                   value="{{ old('prop_room_count', $property->prop_room_count ?? 1) }}"
+                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none"
+                                   min="1" step="1">
                             <button type="button" onclick="updateValue('prop_room_count', 1)" class="counter-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -72,8 +74,10 @@
                                     <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            <input type="number" name="prop_max_guest" id="prop_max_guest" value="{{ old('prop_max_guest', 1) }}"
-                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none" min="1" step="1">
+                            <input type="number" name="prop_max_guest" id="prop_max_guest"
+                                   value="{{ old('prop_max_guest', $property->prop_max_guest ?? 1) }}"
+                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none"
+                                   min="1" step="1">
                             <button type="button" onclick="updateValue('prop_max_guest', 1)" class="counter-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -96,8 +100,10 @@
                                     <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            <input type="number" name="prop_bathroom_count" id="prop_bathroom_count" value="{{ old('prop_bathroom_count', 1) }}"
-                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none" min="1" step="1">
+                            <input type="number" name="prop_bathroom_count" id="prop_bathroom_count"
+                                   value="{{ old('prop_bathroom_count', $property->prop_bathroom_count ?? 1) }}"
+                                   class="mx-4 text-xl font-semibold w-16 text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none"
+                                   min="1" step="1">
                             <button type="button" onclick="updateValue('prop_bathroom_count', 1)" class="counter-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />

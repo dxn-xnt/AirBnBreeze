@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -69,8 +70,13 @@ class UserController extends Controller
 
     public function viewProfile()
     {
+        $user = auth()->user();
+
+        $properties = Property::where('user_id', $user->user_id)->get();
+
         return view('pages.profile-view', [
-            'user' => auth()->user()
+            'user' => $user,
+            'properties' => $properties
         ]);
     }
 

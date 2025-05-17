@@ -34,14 +34,14 @@
             </div>
         </section>
 
-<!-- Listings Section - Optimized 3-column max -->
-<section class="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 sm:gap-x-8 lg:gap-x-9 gap-y-8 sm:gap-y-10 lg:gap-y-12 mb-8 max-w-[1750px] mx-auto">
-        @foreach($properties as $property)
-            <x-property-card :property="$property" />
-        @endforeach
-    </div>
-</section>
+        <!-- Listings Section - Optimized 3-column max -->
+        <section class="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 sm:gap-x-8 lg:gap-x-9 gap-y-8 sm:gap-y-10 lg:gap-y-12 mb-8 max-w-[1750px] mx-auto">
+                @foreach($properties as $property)
+                    <x-property-card :property="$property" />
+                @endforeach
+            </div>
+        </section>
 
 
         <!-- Explore More Section -->

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amenity;
+use App\Models\Images;
 use App\Models\PropertyType;
 use App\Models\Type;
 use App\Models\User;
@@ -17,8 +18,8 @@ use Illuminate\Support\Facades\Log;
 class PropertyEditController extends Controller
 {
 
-    public function viewEditType(Property $property) {
-
+    public function viewEditType(Property $property)
+    {
         $types = Type::all();
         return view('pages.host.edit-property-type', compact('types', 'property'));
     }
@@ -38,11 +39,23 @@ class PropertyEditController extends Controller
     public function viewEditAmenities(Property $property)
     {
         $amenities = Amenity::all()->groupBy('amn_type');
-        return view('pages.host.edit-property-amenities', compact('property', 'amenities'));
+        $propertyAmenities = PropertyAmenity::where('prop_id', $property->prop_id)->get();
+        return view('pages.host.edit-property-amenities', compact('property', 'amenities', 'propertyAmenities'));
     }
+
     public function viewEditPictures(Property $property)
     {
-        return view('pages.host.edit-property-pictures', compact('property'));
+        // Log the property details
+        Log::info('Property Details:', ['property' => $property]);
+
+        // Get images
+        $propertyImages = PropertyImage::where('prop_id', $property->prop_id)->get();
+
+        // Log image count and data
+        Log::info('Property Images Count: ' . $propertyImages->count());
+        Log::debug('Property Images Data:', $propertyImages->toArray());
+
+        return view('pages.host.edit-property-pictures', compact('property', 'propertyImages'));
     }
     public function viewEditPrice(Property $property)
     {
