@@ -42,9 +42,19 @@ class PropertyEditController extends Controller
         $propertyAmenities = PropertyAmenity::where('prop_id', $property->prop_id)->get();
         return view('pages.host.edit-property-amenities', compact('property', 'amenities', 'propertyAmenities'));
     }
+
     public function viewEditPictures(Property $property)
     {
+        // Log the property details
+        Log::info('Property Details:', ['property' => $property]);
+
+        // Get images
         $propertyImages = PropertyImage::where('prop_id', $property->prop_id)->get();
+
+        // Log image count and data
+        Log::info('Property Images Count: ' . $propertyImages->count());
+        Log::debug('Property Images Data:', $propertyImages->toArray());
+
         return view('pages.host.edit-property-pictures', compact('property', 'propertyImages'));
     }
     public function viewEditPrice(Property $property)

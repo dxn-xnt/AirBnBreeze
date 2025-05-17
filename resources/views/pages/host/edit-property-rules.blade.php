@@ -36,6 +36,7 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">House Rules</h3>
                     <div class="flex-col gap-5 px-2">
+                        <!-- No Smoking -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No smoking</p>
                             <div class="flex gap-6">
@@ -47,15 +48,17 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-smoking" class="hidden peer">
+                                    <input type="radio" name="no-smoking" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- No Pets -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No pets allowed</p>
                             <div class="flex gap-6">
@@ -67,15 +70,17 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-pets" class="hidden peer">
+                                    <input type="radio" name="no-pets" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- No Parties -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No parties or events</p>
                             <div class="flex gap-6">
@@ -87,15 +92,17 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-event" class="hidden peer">
+                                    <input type="radio" name="no-event" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Check-in Time -->
                         <div class="flex items-center w-full py-2 gap-6">
                             <p class="whitespace-nowrap text-airbnb-darkest">Check-in time</p>
                             <select id="time-select" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg focus:ring-2 transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
@@ -118,6 +125,8 @@
                                 <option value="16">4:00 PM</option>
                             </select>
                         </div>
+
+                        <!-- Check-out Time -->
                         <div class="flex items-center w-full gap-3 py-2">
                             <p class="whitespace-nowrap text-airbnb-darkest">Check-out time</p>
                             <select id="time-select" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
@@ -146,6 +155,7 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Guest Safety</h3>
                     <div class="flex-col gap-5 px-2">
+                        <!-- Security Camera -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Security camera/recording device</p>
                             <div class="flex gap-6">
@@ -157,15 +167,17 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="security" class="hidden peer">
+                                    <input type="radio" name="security" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Carbon Monoxide Alarm -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Carbon monoxide alarm</p>
                             <div class="flex gap-6">
@@ -177,15 +189,17 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="alarm" class="hidden peer">
+                                    <input type="radio" name="alarm" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Must Climb Stairs -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Must climb stairs</p>
                             <div class="flex gap-6">
@@ -197,9 +211,9 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="star" class="hidden peer">
+                                    <input type="radio" name="stair" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -212,6 +226,7 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Cancellation Policy</h3>
                     <div class="flex-col gap-5 px-2">
+                        <!-- Cancellation Fee -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Cancellation Fee</p>
                             <div class="flex gap-6">
@@ -223,9 +238,9 @@
                                     </div>
                                 </label>
 
-                                <!-- Yes Option -->
+                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="cancellation" class="hidden peer">
+                                    <input type="radio" name="cancellation" class="hidden peer" checked>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -234,7 +249,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <!-- General Error Message -->
                 @if($errors->any())

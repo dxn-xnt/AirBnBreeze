@@ -13,7 +13,6 @@ use App\Http\Controllers\NotificationController;
 // Public Routes
 Route::get('/', [PropertyController::class, 'index'])->name('home');
 Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
-Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profile.view');
 Route::view('/about', 'pages.about-us')->name('about');
 Route::view('/help', 'pages.help-center')->name('help');
 
@@ -31,8 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
     Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');
-});
     Route::view('/favorites', 'pages.Favorites')->name('favorites');
+    Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profile.view');
 
     // Booking Routes
     Route::prefix('bookings')->group(function () {
@@ -61,27 +60,20 @@ Route::middleware('auth')->group(function () {
     // Property Creation Routes
     Route::prefix('property/create')->group(function () {
         Route::get('/starter', [PropertyCreationController::class, 'createProperty_starter'])->name('property.create.starter');
-
         Route::get('/identify-house', [PropertyCreationController::class, 'createProperty_step1'])->name('property.create');
         Route::post('/identify-house', [PropertyCreationController::class, 'storePropertyType'])->name('property.store.type');
-
         Route::get('/location', [PropertyCreationController::class, 'createProperty_step2'])->name('property.step2');
         Route::post('/location', [PropertyCreationController::class, 'storeLocation'])->name('property.storeLocation');
-
         Route::get('/capacity', [PropertyCreationController::class, 'createProperty_step3'])->name('property.step3');
         Route::post('/capacity', [PropertyCreationController::class, 'storeCapacity'])->name('property.storeCapacity');
-
         Route::get('/description', [PropertyCreationController::class, 'createProperty_step4'])->name('property.step4');
         Route::post('/description', [PropertyCreationController::class, 'storeDescription'])->name('property.storeDescription');
-
         Route::get('/amenities', [PropertyCreationController::class, 'createProperty_step5'])->name('property.step5');
         Route::post('/amenities', [PropertyCreationController::class, 'storeAmenities'])->name('property.storeAmenities');
-
         Route::get('/pictures', [PropertyCreationController::class, 'createProperty_step6'])->name('property.step6');
         Route::post('/store-pictures', [PropertyCreationController::class, 'storePictures'])->name('property.storePictures');
         Route::delete('/property/remove-image/{index}', [PropertyCreationController::class, 'removeImage']);
         Route::post('/remove-image', [PropertyCreationController::class, 'removeImage'])->name('property.removeImage');
-
         Route::get('/price', [PropertyCreationController::class, 'createProperty_step7'])->name('property.step7');
         Route::post('/property/store-price-and-save', [PropertyCreationController::class, 'storePriceAndSaveProperty'])->name('property.storePriceAndSave');
     });

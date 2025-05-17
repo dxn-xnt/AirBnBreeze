@@ -59,7 +59,7 @@
                 <!-- Common user links -->
                 <a href="{{ route('bookings.index') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">My Bookings</a>
                 <a href="{{ route('favorites') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Favorites</a>
-                <a href="{{ route('bookings.index') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Account</a>
+                <a href="{{ route('profile.view') }}" class="block py-[0.35rem] px-2 text-airbnb-darkest hover:bg-airbnb-light rounded font-medium">Account</a>
 
                 <!-- User/Host specific links -->
                 @if(auth()->user()->user_is_host)
