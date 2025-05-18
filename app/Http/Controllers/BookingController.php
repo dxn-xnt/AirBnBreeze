@@ -3,46 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 
 class BookingController extends Controller
 {
     // Display the user's bookings
-    public function index()
+    public function index(Request $request, $category = null)
     {
-        // Mock bookings data (in a real app, you would fetch this from a database)
-        $bookings = [
-            [
-                'id' => 1,
-                'property_id' => 3,
-                'property_name' => 'Limosnero\'s Private House',
-                'status' => 'upcoming',
-                'image' => 'assets/images/HOUSE (3).png',
-                'schedule' => [
-                    'start_date' => 'April 24',
-                    'end_date' => '30, 2025',
-                ],
-                'cost' => 1900,
-                'notes' => '2 rooms, 10 guests, additional 3 beds',
-            ],
-            [
-                'id' => 2,
-                'property_id' => 2,
-                'property_name' => 'Limosnero\'s Private House',
-                'status' => 'upcoming',
-                'image' => 'assets/images/HOUSE (2).png',
-                'schedule' => [
-                    'start_date' => 'April 24',
-                    'end_date' => '30, 2025',
-                ],
-                'cost' => 1900,
-                'notes' => '2 rooms, 10 guests',
-            ],
-        ];
+        // Get current user ID
+        $userId = Auth::id();
 
-        return view('pages.bookings', compact('bookings'));
+        // Default to 'upcoming' if no category is provided
+        if (!$category) {
+            $category = 'upcoming';
+        }
+
+        // Validate that the category is valid
+        if (!in_array($category, ['upcoming', 'pending', 'recent', 'cancelled'])) {
+            $category = 'upcoming';
+        }
+
+        // Fetch bookings based on the category
+        $bookings = Booking::where('user_guest_id', $userId)
+            ->when($category === 'upcoming', function ($query) {
+                $query->where('book_status', 'upcoming');
+            })
+            ->when($category === 'pending', function ($query) {
+                $query->where('book_status', 'pending');
+            })
+            ->when($category === 'recent', function ($query) {
+                $query->orderByDesc('book_date_created')->take(5);
+            })
+            ->when($category === 'cancelled', function ($query) {
+                $query->where('book_status', 'cancelled');
+            })
+            ->with(['property' => function ($query) {
+                $query->with('images'); // Eager load images relationship
+            }])
+            ->get();
+
+        return view('pages.bookings', compact('bookings', 'category'));
     }
 
     // Create a new booking request from a property
@@ -56,9 +60,31 @@ class BookingController extends Controller
     // Process the final booking request
     public function processBooking(Request $request, $property_id)
     {
-        // In a real app, you would save the booking details to the database
-        // For now, simply redirect to the bookings page
-        return redirect()->route('bookings.index');
+        // Validate request
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'total_cost' => 'required|numeric',
+            'notes' => 'nullable|string',
+            'book_adult_count' => 'required|integer|min:1',
+            'book_child_count' => 'required|integer|min:0',
+        ]);
+
+        // Save to database
+        Booking::create([
+            'book_check_in' => $request->input('start_date'),
+            'book_check_out' => $request->input('end_date'),
+            'book_total_price' => $request->input('total_cost'),
+            'book_notes' => $request->input('notes'),
+            'book_adult_count' => $request->input('book_adult_count'),
+            'book_child_count' => $request->input('book_child_count'),
+            'prop_id' => $property_id,
+            'user_guest_id' => Auth::id(), // assumes user is logged in
+            'book_status' => 'pending', // All new bookings start as pending
+        ]);
+
+        return redirect()->route('bookings.category', ['category' => 'pending'])
+            ->with('success', 'Booking request submitted successfully.');
     }
 
     // Cancel a booking request (go back to property page)
@@ -71,36 +97,38 @@ class BookingController extends Controller
     // Show booking details
     public function show($id)
     {
-        // In a real app, you would fetch a specific booking
-        return redirect()->route('bookings.index');
+        $booking = Booking::with(['property' => function ($query) {
+            $query->with('images'); // Eager load images relationship
+        }])->findOrFail($id);
+
+        // Ensure the user can only view their own bookings
+        if ($booking->user_guest_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('pages.booking-details', compact('booking'));
     }
 
     // Cancel a booking
     public function cancel($id)
     {
-        // In a real app, you would cancel the booking in the database
-        return redirect()->route('bookings.index');
-    }
+        $booking = Booking::findOrFail($id);
 
-    // Helper method to get property data
-    private function getPropertyById($id)
-    {
-        // In a real app, this would be from the database
-        return [
-            'id' => $id,
-            'name' => 'Limosnero\'s Private House',
-            'location' => 'Minglanilla, Cebu',
-            'cost_per_night' => 1900,
-            'rating' => 4.9,
-            'images' => [
-                'main' => 'assets/images/HOUSE (1).png',
-                'gallery' => [
-                    'assets/images/HOUSE (2).png',
-                    'assets/images/HOUSE (3).png',
-                    'assets/images/HOUSE (4).png',
-                    'assets/images/HOUSE (5).png',
-                ]
-            ],
-        ];
+        // Ensure the user can only cancel their own bookings
+        if ($booking->user_guest_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Only allow cancellation for upcoming or pending bookings
+        if (!in_array($booking->book_status, ['upcoming', 'pending'])) {
+            return back()->with('error', 'This booking cannot be cancelled.');
+        }
+
+        // Update booking status to cancelled
+        $booking->book_status = 'cancelled';
+        $booking->save();
+
+        return redirect()->route('bookings.category', ['category' => 'cancelled'])
+            ->with('success', 'Booking has been cancelled successfully.');
     }
 }

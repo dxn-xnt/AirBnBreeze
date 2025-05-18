@@ -27,8 +27,12 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     // Booking Routes
     Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
+
+    // Updated booking routes with category support
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{category}', [BookingController::class, 'index'])->name('bookings.category');
+
+    Route::get('/bookings/details/{id}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
@@ -59,7 +63,7 @@ Route::prefix('property/create')->middleware(['auth'])->group(function () {
     Route::post('/remove-image', [PropertyCreationController::class, 'removeImage'])->name('property.removeImage');
     //Price
     Route::get('/price', [PropertyCreationController::class, 'createProperty_step7'])->name('property.step7');
-    Route::post('/property/store-price-and-save', [PropertyCreationController::class, 'storePriceAndSaveProperty'])->name('property.storePriceAndSave');
+    Route::post('/property/store-price-and-save', [PropertyCreationController::class, 'storePriceAndSave'])->name('property.storePriceAndSave');
 });
 
 Route::prefix('host')->middleware(['auth'])->group(function () {
@@ -88,11 +92,8 @@ Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profi
 Route::get('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
 Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
 Route::get('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
-Route::post('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
+Route::post('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process')->middleware('auth');
 Route::get('/property/{id}/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
-
-// Cancel existing booking
-Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 
 // Notifications
 Route::prefix('notifications')->group(function () {
@@ -117,10 +118,6 @@ Route::get('/help', function () {
     return view('pages.HelpCenter');
 })->name('help');
 
-// Fallback route
-Route::fallback(function () {
-    return view('pages.404');
-});
 // Fallback route
 Route::fallback(function () {
     return view('pages.404');
