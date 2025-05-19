@@ -16,8 +16,8 @@ Route::get('/property/{id}', [PropertyController::class, 'show'])->name('propert
 Route::view('/about', 'pages.about-us')->name('about');
 Route::view('/help', 'pages.help-center')->name('help');
 
-// Authentication Routes
-Route::middleware('guest')->group(function () {
+// Public Routes
+Route::middleware(['guest'])->group(function () {
     Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [LogInController::class, 'login'])->name('user.login');
     Route::get('/signup', [UserController::class, 'showSignUp'])->name('signup');
@@ -25,8 +25,16 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated Routes
-Route::middleware('auth')->group(function () {
-    // User Routes
+Route::middleware(['auth'])->group(function () {
+    // Booking Routes
+    Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
+
+    // Updated booking routes with category support
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{category}', [BookingController::class, 'index'])->name('bookings.category');
+
+    Route::get('/bookings/details/{id}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
     Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');

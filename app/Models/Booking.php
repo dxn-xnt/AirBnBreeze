@@ -8,6 +8,7 @@ class Booking extends Model
 {
     protected $table = 'booking';
     protected $primaryKey = 'book_id';
+    public $timestamps = false; // Disable timestamps
     protected $fillable = [
         'book_check_in',
         'book_check_out',
@@ -20,10 +21,14 @@ class Booking extends Model
         'prop_id',
         'user_guest_id'
     ];
-    public function property(){
-        return $this->belongsTo(Property::class,'prop_id');
+
+    public function property()
+    {
+        return $this->belongsTo(Property::class, 'prop_id');
     }
-    public function user(){
-        return $this->belongsTo(User::class,'user_id');
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_guest_id');
     }
 }
