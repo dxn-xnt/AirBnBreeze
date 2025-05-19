@@ -37,6 +37,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
     Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');
+
+    // Move booking process routes here inside auth middleware
+    Route::get('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
+    Route::get('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
+    Route::post('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
+    Route::get('/property/{id}/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
+
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+        Route::delete('/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
+    });
 });
 
 Route::prefix('property/create')->middleware(['auth'])->group(function () {
@@ -86,27 +100,12 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
         });
     });
 });
-Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profile.view');
-
-// Request booking process
-Route::get('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
-Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
-Route::get('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
-Route::post('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process')->middleware('auth');
-Route::get('/property/{id}/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
-
-// Notifications
-Route::prefix('notifications')->group(function () {
-    Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::delete('/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
-});
+Route::get('/profile-view', [UserController::class, 'viewProfile'])->middleware(['auth'])->name('profile.view');
 
 // Favorites page
 Route::get('/favorites', function () {
     return view('pages.Favorites');
-})->name('favorites');
+})->middleware(['auth'])->name('favorites');
 
 // About Us page
 Route::get('/about', function () {
