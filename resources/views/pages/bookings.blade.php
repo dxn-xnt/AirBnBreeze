@@ -82,7 +82,6 @@
                             </div>
 
                             <!-- Action Buttons -->
-                            <!-- Action Buttons -->
                             <div class="flex flex-col gap-2 ml-4">
                                 @if($booking->book_status == 'pending' || $booking->book_status == 'upcoming')
                                     <!-- Optional Edit Button -->
