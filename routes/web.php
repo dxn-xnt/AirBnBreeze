@@ -12,6 +12,7 @@ use App\Http\Controllers\NotificationController;
 
 // Public Routes
 Route::get('/', [PropertyController::class, 'index'])->name('home');
+Route::post('/', [PropertyController::class, 'showFiltered'])->name('properties.search');
 Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
 Route::view('/about', 'pages.about-us')->name('about');
 Route::view('/help', 'pages.help-center')->name('help');

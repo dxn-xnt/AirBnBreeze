@@ -272,13 +272,36 @@ class PropertyEditController extends Controller
     }
     public function updateRules(Request $request, Property $property)
     {
+        // Enhanced validation with custom error messages
         $validated = $request->validate([
             // House Rules
             'no_smoking' => 'required|boolean',
             'no_pets' => 'required|boolean',
             'no_parties' => 'required|boolean',
-            'check_in_time' => 'required|integer|between:0,23',
-            'check_out_time' => 'required|integer|between:0,23',
+            'check_in_time' => [
+                'required',
+                'integer',
+                'between:0,23',
+                function ($attribute, $value, $fail) {
+                    if ($value < 0 || $value > 23) {
+                        $fail('The check-in time must be between 0 and 23.');
+                    }
+                }
+            ],
+            'check_out_time' => [
+                'required',
+                'integer',
+                'between:0,23',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value < 0 || $value > 23) {
+                        $fail('The check-out time must be between 0 and 23.');
+                    }
+                    // Ensure check-out is after check-in
+                    if ($value <= $request->check_in_time) {
+                        $fail('Check-out time must be after check-in time.');
+                    }
+                }
+            ],
 
             // Guest Safety
             'has_security_camera' => 'required|boolean',
@@ -287,17 +310,31 @@ class PropertyEditController extends Controller
 
             // Cancellation Policy
             'has_cancellation_fee' => 'required|in:yes,no',
-            'cancellation_rate' => 'required_if:has_cancellation_fee,yes|numeric|min:0|max:100'
+            'cancellation_rate' => [
+                'required_if:has_cancellation_fee,yes',
+                'numeric',
+                'min:0',
+                'max:100',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->has_cancellation_fee === 'yes' && ($value < 0 || $value > 100)) {
+                        $fail('Cancellation rate must be between 0% and 100%.');
+                    }
+                }
+            ]
+        ], [
+            'check_in_time.between' => 'Check-in time must be between 0 (12 AM) and 23 (11 PM)',
+            'check_out_time.between' => 'Check-out time must be between 0 (12 AM) and 23 (11 PM)',
+            'cancellation_rate.required_if' => 'Cancellation rate is required when cancellation fee is enabled'
         ]);
 
         try {
             $draftData = session()->get('property_draft', []);
 
-            // Map form fields to database columns
+            // Enhanced data mapping with additional business logic
             $rulesData = [
                 'prop_id' => $property->prop_id,
-                'rule_check_in' => (bool)$validated['check_in_time'],
-                'rule_check_out' => (bool)$validated['check_out_time'],
+                'rule_check_in' => (int)$validated['check_in_time'],
+                'rule_check_out' => (int)$validated['check_out_time'],
                 'rule_no_smoking' => (bool)$validated['no_smoking'],
                 'rule_no_pet' => (bool)$validated['no_pets'],
                 'rule_no_events' => (bool)$validated['no_parties'],
@@ -306,25 +343,60 @@ class PropertyEditController extends Controller
                 'rule_stairs' => (bool)$validated['must_climb_stairs'],
                 'rule_cancellation' => $validated['has_cancellation_fee'],
                 'rule_cancellation_rate' => $validated['has_cancellation_fee'] === 'yes'
-                    ? $validated['cancellation_rate']
-                    : null
+                    ? (float)$validated['cancellation_rate']
+                    : null,
+                'updated_at' => now() // Track when these rules were last updated
             ];
 
-            $draftData['rules'] = $rulesData;
+            // Merge with existing draft data
+            $draftData['rules'] = array_merge($draftData['rules'] ?? [], $rulesData);
+
+            // Calculate and store any derived fields
+            $draftData['rules']['rule_strictness'] = $this->calculateRulesStrictness($rulesData);
+
             session()->put('property_draft', $draftData);
 
             return response()->json([
                 'success' => true,
-                'data' => $rulesData
+                'data' => $rulesData,
+                'message' => 'Rules updated successfully',
+                'strictness_level' => $draftData['rules']['rule_strictness'] ?? null
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error updating rules: ' . $e->getMessage());
+            Log::error('Error updating rules for property ' . $property->prop_id, [
+                'error' => $e->getMessage(),
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update rules'
+                'message' => 'Failed to update rules. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
+    }
+
+    /**
+     * Calculate a "strictness" score based on rules configuration
+     */
+    private function calculateRulesStrictness(array $rulesData): int
+    {
+        $score = 0;
+
+        // Add points for strict rules
+        if ($rulesData['rule_no_smoking']) $score += 20;
+        if ($rulesData['rule_no_pet']) $score += 20;
+        if ($rulesData['rule_no_events']) $score += 30;
+        if ($rulesData['rule_security_cam']) $score += 15;
+
+        // Add points for cancellation policy
+        if ($rulesData['rule_cancellation'] === 'yes') {
+            $score += min(15, $rulesData['rule_cancellation_rate']);
+        }
+
+        return min(100, $score); // Cap at 100
     }
     public function saveAllUpdates(Request $request, Property $property)
     {
