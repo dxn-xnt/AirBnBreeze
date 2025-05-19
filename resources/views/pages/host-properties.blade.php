@@ -8,7 +8,7 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                 <h1 class="text-[1.5rem] sm:text-[1.75rem] font-semibold text-airbnb-darkest ">Properties</h1>
 
-                <div class="flex flex-1 max-w-2xl">
+                <div class="flex flex-1 max-w-2xl gap-3">
                     <!-- Search Bar -->
                     <x-host-search-bar />
 

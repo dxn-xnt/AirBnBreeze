@@ -44,7 +44,7 @@
                                     name="amenities[]"
                                     value="{{ $amenity->amn_id }}"
                                     class="absolute opacity-0 w-0 h-0 peer"
-                                    {{ in_array($amenity->amn_id, old('amenities', [])) ? 'checked' : '' }}
+                                    {{ in_array($amenity->amn_id, old('amenities', $propertyAmenities->pluck('amn_id')->toArray() ?? [])) ? 'checked' : '' }}
                                 >
                                 <div class="flex items-center gap-3 py-2 px-6 rounded-lg whitespace-nowrap text-lg justify-start transition-all duration-200 border border-airbnb-dark text-airbnb-dark peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light hover:bg-airbnb-light hover:border-airbnb-dark group-hover:shadow-sm">
                                     <i
@@ -69,7 +69,7 @@
                                     name="amenities[]"
                                     value="{{ $amenity->amn_id }}"
                                     class="absolute opacity-0 w-0 h-0 peer"
-                                    {{ in_array($amenity->amn_id, old('amenities', [])) ? 'checked' : '' }}
+                                    {{ in_array($amenity->amn_id, old('amenities', $propertyAmenities->pluck('amn_id')->toArray() ?? [])) ? 'checked' : '' }}
                                 >
                                 <div class="flex items-center gap-3 py-2 px-6 rounded-lg whitespace-nowrap text-lg justify-start transition-all duration-200 border border-airbnb-dark text-airbnb-dark peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light hover:bg-airbnb-light hover:border-airbnb-dark group-hover:shadow-sm">
                                     <i
@@ -94,7 +94,7 @@
                                     name="amenities[]"
                                     value="{{ $amenity->amn_id }}"
                                     class="absolute opacity-0 w-0 h-0 peer"
-                                    {{ in_array($amenity->amn_id, old('amenities', [])) ? 'checked' : '' }}
+                                    {{ in_array($amenity->amn_id, old('amenities', $propertyAmenities->pluck('amn_id')->toArray() ?? [])) ? 'checked' : '' }}
                                 >
                                 <div class="flex items-center gap-3 py-2 px-6 rounded-lg whitespace-nowrap text-lg justify-start transition-all duration-200 border border-airbnb-dark text-airbnb-dark peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light hover:bg-airbnb-light hover:border-airbnb-dark group-hover:shadow-sm">
                                     <i

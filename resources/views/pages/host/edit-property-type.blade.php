@@ -37,15 +37,37 @@
             <div class="m-auto w-full max-w-screen-lg px-8">
                 <div class="bg-transparent py-8 px-4 sm:px-10 max-w-[1750px] mx-auto">
                     <!-- Property Type Selection -->
-
                         <div>
                             <label class="block text-xl font-medium text-airbnb-darkest mb-3">Property type</label>
                             <div class="grid grid-cols-3 gap-4" id="propertyTypeGrid">
                                 @foreach($types as $type)
-                                    <x-option-item
-                                        :type="$type"
-                                        data-value="{{ $type->type_name }}"
-                                    />
+                                    @php
+                                        $typeName = is_array($type) ? $type['type_name'] : $type->type_name;
+                                        $isChecked = old('prop_type', $property->prop_type) == $typeName;
+                                    @endphp
+
+                                    <label class="relative block cursor-pointer group" x-data="{ isChecked: {{ $isChecked ? 'true' : 'false' }} }">
+                                        <input
+                                            type="radio"
+                                            name="prop_type"
+                                            value="{{ $typeName }}"
+                                            class="absolute opacity-0 w-0 h-0 peer"
+                                            data-value="{{ $typeName }}"
+                                            {{ $isChecked ? 'checked' : '' }}
+                                            @change="isChecked = $event.target.checked"
+                                        >
+
+                                        <div class="flex items-center gap-3 py-2 px-6 rounded-lg whitespace-nowrap text-lg justify-start transition-all duration-200 border border-airbnb-darkest text-airbnb-darkest peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light hover:bg-airbnb-light hover:border-airbnb-dark group-hover:shadow-sm">
+                                            <i
+                                                class="h-8 w-8 transition-colors duration-200"
+                                                data-lucide="{{ is_array($type) ? $type['icon_name'] : $type->icon_name }}"
+                                                :class="isChecked ? 'text-airbnb-light' : 'text-airbnb-dark'"
+                                            ></i>
+                                            <span class="text-center w-full font-medium">
+                                                {{ $typeName }}
+                                            </span>
+                                        </div>
+                                    </label>
                                 @endforeach
                             </div>
                             @error('prop_type')

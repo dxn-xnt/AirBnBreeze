@@ -39,11 +39,13 @@
                     <div class="flex-col bg-airbnb-lightest justify-items-center">
                         <div class="py-1 px-1 flex align-bottom items-end">
                             <span class="text-airbnb-darkest text-[2rem] align-bottom pb-5">₱</span>
-                            <input type="number" name="prop_price_per_night" id="price"
-                                   value="{{ old('prop_price_per_night', session('property_data.prop_price_per_night', 0)) }}"
-                                   class="text-[5rem] max-w-[300px] h-21 align-bottom font-semibold text-center bg-airbnb-light appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-none"
+                            <input type="text"
+                                   name="prop_price_per_night"
+                                   id="price"
+                                   value="{{ number_format((int)old('prop_price_per_night', session('property_data.prop_price_per_night', $property->prop_price_per_night ?? 0)), 0, '', '') }}"
+                                   class="text-[5rem] max-w-[300px] h-21 align-bottom font-semibold text-center bg-airbnb-light appearance-none focus:outline-none"
                                    min="1"
-                                   step="1">
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         </div>
                         <span class="text-airbnb-dark text-md">rate per night</span>
                     </div>

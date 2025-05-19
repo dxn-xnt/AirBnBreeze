@@ -37,9 +37,6 @@ class PropertyCreationController extends Controller
         // Store the selected property type in the session
         session()->put('property_data.prop_type', $validated['prop_type']);
 
-        // Log the session data for debugging (optional)
-        \Log::info('Stored property type in session:', ['prop_type' => $validated['prop_type']]);
-
         // Redirect to the next step
         return redirect()->route('property.step2');
     }
