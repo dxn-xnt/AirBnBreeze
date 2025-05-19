@@ -4,8 +4,13 @@
     <!-- Main Content -->
     <div class="relative w-full h-full mt-28 mb-10 bg-airbnb-light gap-2">
         <!-- Form -->
-        <form id="addressForm" action="#" method="POST">
+        <form id="addressForm" action="{{ route('property.update.location', ['property' => $property->prop_id]) }}" method="POST">
             @csrf
+            @method('PUT')
+
+            <!-- Hidden field to determine which button was clicked -->
+            <input type="hidden" name="form_action" id="form_action" value="">
+
             <div class="px-[8%]">
                 <div class="flex justify-between mb-3">
                     <h2 class="text-left text-3xl font-extrabold text-gray-900">
@@ -15,7 +20,8 @@
                         <a href="{{ url()->previous() }}" class="min-w-[150px] inline-flex justify-center py-2 px-4 border-[1px] border-airbnb-dark shadow-sm text-lg font-medium rounded-full text-airbnb-dark bg-airbnb-light hover:text-airbnb-darkest hover:border-airbnb-darkest focus:outline-none focus:ring-airbnb-light">
                             Back
                         </a>
-                        <button type="submit" class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark">
+                        <button type="submit" name="save_and_exit" class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark"
+                                onclick="setFormAction('save_and_exit')">
                             Save & Exit
                         </button>
                     </div>
@@ -39,8 +45,11 @@
                     <h2 class="block text-xl font-medium text-airbnb-darkest mb-2">Add the address of the property</h2>
 
                     @php
-                        // Split the address into parts
-                        $addressParts = $property->prop_address ? explode(', ', $property->prop_address) : [];
+                        // Check for draft data first, then fall back to property data
+                        $draftLocation = session()->get('property_draft.location', []);
+                        $addressParts = !empty($draftLocation)
+                            ? [$draftLocation['street_address'], $draftLocation['city'], $draftLocation['province']]
+                            : ($property->prop_address ? explode(', ', $property->prop_address) : []);
                         $street = old('street_address', $addressParts[0] ?? '');
                         $city = old('city', $addressParts[1] ?? '');
                         $province = old('province', $addressParts[2] ?? '');
@@ -80,6 +89,81 @@
                     </div>
                 </div>
             </div>
+            <div class="flex gap-3 mt-6 max-w-screen-xl justify-end">
+                <button type="submit" name="save_draft" class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark"
+                        onclick="setFormAction('save_draft')">
+                    Save
+                </button>
+            </div>
         </form>
     </div>
+
+    @push('scripts')
+        <script>
+            function setFormAction(action) {
+                document.getElementById('form_action').value = action;
+            }
+
+            document.getElementById('addressForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = this;
+                const formData = new FormData(form);
+                const action = formData.get('form_action');
+
+                // Determine the endpoint based on which button was clicked
+                const endpoint = action === 'save_and_exit'
+                    ? "{{ route('property.save.all.updates', ['property' => $property->prop_id]) }}"
+                    : "{{ route('property.update.location', ['property' => $property->prop_id]) }}";
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (action === 'save_and_exit') {
+                                // Redirect to property page or listings page
+                                window.location.href = "{{ route('host.listing') }}";
+                            } else {
+                                // Show success message for draft save
+                                const event = new CustomEvent('show-toast', {
+                                    detail: {
+                                        message: 'Location changes saved to draft',
+                                        type: 'success'
+                                    }
+                                });
+                                document.dispatchEvent(event);
+                            }
+                        } else {
+                            // Show error message
+                            const event = new CustomEvent('show-toast', {
+                                detail: {
+                                    message: data.message || 'Error saving changes',
+                                    type: 'error'
+                                }
+                            });
+                            document.dispatchEvent(event);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        const event = new CustomEvent('show-toast', {
+                            detail: {
+                                message: 'An error occurred while saving',
+                                type: 'error'
+                            }
+                        });
+                        document.dispatchEvent(event);
+                    });
+            });
+        </script>
+    @endpush
 @endsection
+
+@extends('layouts.app')

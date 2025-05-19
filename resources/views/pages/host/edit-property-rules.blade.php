@@ -2,19 +2,22 @@
 
 @section('content')
     <div class="relative w-full h-full mt-28 mb-10 bg-airbnb-light gap-2">
-        <!-- Amenities Form -->
-        <form id="amenitiesForm" action="{{ route('property.storeAmenities') }}" method="POST">
+        <form id="rulesForm" action="{{ route('property.update.rules', ['property' => $property->prop_id]) }}" method="POST">
             @csrf
+            <input type="hidden" name="form_action" id="form_action" value="">
+
             <div class="px-[8%]">
                 <div class="flex justify-between mb-3">
                     <h2 class="text-left text-3xl font-extrabold text-gray-900">
                         Listing Editor
                     </h2>
                     <div class="flex gap-3">
-                        <a href="{{ url()->previous() }}" class="min-w-[150px] inline-flex justify-center py-2 px-4 border-[1px] border-airbnb-dark shadow-sm text-lg font-medium rounded-full text-airbnb-dark bg-airbnb-light hover:text-airbnb-darkest hover:border-airbnb-darkest focus:outline-none focus:ring-airbnb-light">
+                        <a href="{{ route('host.listing') }}" class="min-w-[150px] inline-flex justify-center py-2 px-4 border-[1px] border-airbnb-dark shadow-sm text-lg font-medium rounded-full text-airbnb-dark bg-airbnb-light hover:text-airbnb-darkest hover:border-airbnb-darkest focus:outline-none focus:ring-airbnb-light">
                             Back
                         </a>
-                        <button type="submit" class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark">
+                        <button type="submit"
+                                onclick="setFormAction('save_and_exit')"
+                                class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark">
                             Save & Exit
                         </button>
                     </div>
@@ -33,6 +36,12 @@
             </div>
 
             <div class="m-auto w-full max-w-screen-md p-8">
+                @php
+                    // Get draft data or fall back to existing property rules
+                    $draftRules = session()->get('property_draft.rules', []);
+                    $propertyRules = $property->rules ?? new \App\Models\PropertyRules();
+                @endphp
+
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">House Rules</h3>
                     <div class="flex-col gap-5 px-2">
@@ -40,17 +49,16 @@
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No smoking</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-smoking" class="hidden peer">
+                                    <input type="radio" name="no_smoking" value="0" class="hidden peer"
+                                        {{ (old('no_smoking', $draftRules['no_smoking'] ?? $propertyRules->no_smoking ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-smoking" class="hidden peer" checked>
+                                    <input type="radio" name="no_smoking" value="1" class="hidden peer"
+                                        {{ (old('no_smoking', $draftRules['no_smoking'] ?? $propertyRules->no_smoking ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -62,17 +70,16 @@
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No pets allowed</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-pets" class="hidden peer">
+                                    <input type="radio" name="no_pets" value="0" class="hidden peer"
+                                        {{ (old('no_pets', $draftRules['no_pets'] ?? $propertyRules->no_pets ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-pets" class="hidden peer" checked>
+                                    <input type="radio" name="no_pets" value="1" class="hidden peer"
+                                        {{ (old('no_pets', $draftRules['no_pets'] ?? $propertyRules->no_pets ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -84,17 +91,16 @@
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">No parties or events</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-event" class="hidden peer">
+                                    <input type="radio" name="no_parties" value="0" class="hidden peer"
+                                        {{ (old('no_parties', $draftRules['no_parties'] ?? $propertyRules->no_parties ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="no-event" class="hidden peer" checked>
+                                    <input type="radio" name="no_parties" value="1" class="hidden peer"
+                                        {{ (old('no_parties', $draftRules['no_parties'] ?? $propertyRules->no_parties ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -105,48 +111,34 @@
                         <!-- Check-in Time -->
                         <div class="flex items-center w-full py-2 gap-6">
                             <p class="whitespace-nowrap text-airbnb-darkest">Check-in time</p>
-                            <select id="time-select" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg focus:ring-2 transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
-                                <option value="0">12:00 AM</option>
-                                <option value="1">1:00 AM</option>
-                                <option value="2">2:00 AM</option>
-                                <option value="3">3:00 AM</option>
-                                <option value="4">4:00 AM</option>
-                                <option value="5">5:00 AM</option>
-                                <option value="6">6:00 AM</option>
-                                <option value="7">7:00 AM</option>
-                                <option value="8">8:00 AM</option>
-                                <option value="9">9:00 AM</option>
-                                <option value="10">10:00 AM</option>
-                                <option value="11">11:00 AM</option>
-                                <option value="12">12:00 PM</option>
-                                <option value="13" selected>1:00 PM</option>
-                                <option value="14">2:00 PM</option>
-                                <option value="15">3:00 PM</option>
-                                <option value="16">4:00 PM</option>
+                            <select name="check_in_time" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg focus:ring-2 transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
+                                @foreach(range(0, 23) as $hour)
+                                    @php
+                                        $timeValue = $hour;
+                                        $timeDisplay = ($hour % 12 == 0 ? 12 : $hour % 12) . ':00 ' . ($hour < 12 ? 'AM' : 'PM');
+                                        $selectedTime = old('check_in_time', $draftRules['check_in_time'] ?? $propertyRules->check_in_time ?? 13);
+                                    @endphp
+                                    <option value="{{ $timeValue }}" {{ $timeValue == $selectedTime ? 'selected' : '' }}>
+                                        {{ $timeDisplay }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
                         <!-- Check-out Time -->
                         <div class="flex items-center w-full gap-3 py-2">
                             <p class="whitespace-nowrap text-airbnb-darkest">Check-out time</p>
-                            <select id="time-select" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
-                                <option value="0">12:00 AM</option>
-                                <option value="1">1:00 AM</option>
-                                <option value="2">2:00 AM</option>
-                                <option value="3">3:00 AM</option>
-                                <option value="4">4:00 AM</option>
-                                <option value="5">5:00 AM</option>
-                                <option value="6">6:00 AM</option>
-                                <option value="7">7:00 AM</option>
-                                <option value="8">8:00 AM</option>
-                                <option value="9">9:00 AM</option>
-                                <option value="10">10:00 AM</option>
-                                <option value="11">11:00 AM</option>
-                                <option value="12" selected>12:00 PM</option>
-                                <option value="13">1:00 PM</option>
-                                <option value="14">2:00 PM</option>
-                                <option value="15">3:00 PM</option>
-                                <option value="16">4:00 PM</option>
+                            <select name="check_out_time" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
+                                @foreach(range(0, 23) as $hour)
+                                    @php
+                                        $timeValue = $hour;
+                                        $timeDisplay = ($hour % 12 == 0 ? 12 : $hour % 12) . ':00 ' . ($hour < 12 ? 'AM' : 'PM');
+                                        $selectedTime = old('check_out_time', $draftRules['check_out_time'] ?? $propertyRules->check_out_time ?? 12);
+                                    @endphp
+                                    <option value="{{ $timeValue }}" {{ $timeValue == $selectedTime ? 'selected' : '' }}>
+                                        {{ $timeDisplay }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -155,21 +147,26 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Guest Safety</h3>
                     <div class="flex-col gap-5 px-2">
-                        <!-- Security Camera -->
+                        @php
+                            // Get draft data or fall back to existing property rules
+                            $draftRules = session()->get('property_draft.rules', []);
+                            $propertyRules = $property->rules ?? new \App\Models\PropertyRules();
+                        @endphp
+
+                            <!-- Security Camera -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Security camera/recording device</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="security" class="hidden peer">
+                                    <input type="radio" name="has_security_camera" value="0" class="hidden peer"
+                                        {{ (old('has_security_camera', $draftRules['has_security_camera'] ?? $propertyRules->has_security_camera ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="security" class="hidden peer" checked>
+                                    <input type="radio" name="has_security_camera" value="1" class="hidden peer"
+                                        {{ (old('has_security_camera', $draftRules['has_security_camera'] ?? $propertyRules->has_security_camera ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -181,17 +178,16 @@
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Carbon monoxide alarm</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="alarm" class="hidden peer">
+                                    <input type="radio" name="has_carbon_monoxide_alarm" value="0" class="hidden peer"
+                                        {{ (old('has_carbon_monoxide_alarm', $draftRules['has_carbon_monoxide_alarm'] ?? $propertyRules->has_carbon_monoxide_alarm ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="alarm" class="hidden peer" checked>
+                                    <input type="radio" name="has_carbon_monoxide_alarm" value="1" class="hidden peer"
+                                        {{ (old('has_carbon_monoxide_alarm', $draftRules['has_carbon_monoxide_alarm'] ?? $propertyRules->has_carbon_monoxide_alarm ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -203,17 +199,16 @@
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Must climb stairs</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="stair" class="hidden peer">
+                                    <input type="radio" name="must_climb_stairs" value="0" class="hidden peer"
+                                        {{ (old('must_climb_stairs', $draftRules['must_climb_stairs'] ?? $propertyRules->must_climb_stairs ?? 0) == 0) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="stair" class="hidden peer" checked>
+                                    <input type="radio" name="must_climb_stairs" value="1" class="hidden peer"
+                                        {{ (old('must_climb_stairs', $draftRules['must_climb_stairs'] ?? $propertyRules->must_climb_stairs ?? 0) == 1) ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -225,32 +220,48 @@
 
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Cancellation Policy</h3>
-                    <div class="flex-col gap-5 px-2">
+                    @php
+                        $cancellationFee = old('has_cancellation_fee', $draftRules['has_cancellation_fee'] ?? $propertyRules->has_cancellation_fee ?? 'no');
+                        $cancellationRate = old('cancellation_rate', $draftRules['cancellation_rate'] ?? $propertyRules->cancellation_rate ?? 10);
+                    @endphp
+
+                    <div x-data="{ cancellationFee: '{{ $cancellationFee }}' }" class="flex-col gap-5 px-2">
                         <!-- Cancellation Fee -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Cancellation Fee</p>
                             <div class="flex gap-6">
-                                <!-- No Option -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="cancellation" class="hidden peer">
+                                    <input type="radio" name="has_cancellation_fee" value="no" class="hidden peer"
+                                           x-model="cancellationFee"
+                                        {{ $cancellationFee == 'no' ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
-
-                                <!-- Yes Option (Default Checked) -->
                                 <label class="flex items-center cursor-pointer">
-                                    <input type="radio" name="cancellation" class="hidden peer" checked>
+                                    <input type="radio" name="has_cancellation_fee" value="yes" class="hidden peer"
+                                           x-model="cancellationFee"
+                                        {{ $cancellationFee == 'yes' ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Cancellation Rate (Conditional) -->
+                        <div x-show="cancellationFee === 'yes'" x-transition class="relative flex items-center w-full gap-3 py-2">
+                            <p class="whitespace-nowrap text-airbnb-darkest">Cancellation Rate</p>
+                            <select name="cancellation_rate" class="time-dropdown w-full p-2 border border-airbnb-darkest rounded-lg transition-all duration-200 appearance-none bg-airbnb-light bg-no-repeat bg-[right_1rem_center] pr-10">
+                                <option value="10" {{ $cancellationRate == 10 ? 'selected' : '' }}>10%</option>
+                                <option value="15" {{ $cancellationRate == 15 ? 'selected' : '' }}>15%</option>
+                                <option value="20" {{ $cancellationRate == 20 ? 'selected' : '' }}>20%</option>
+                                <option value="25" {{ $cancellationRate == 25 ? 'selected' : '' }}>25%</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- General Error Message -->
                 @if($errors->any())
                     <div class="mt-2 text-sm text-red-600">
                         <ul>
@@ -261,15 +272,81 @@
                     </div>
                 @endif
             </div>
+            <div class="flex gap-3 mt-6 max-w-screen-xl justify-end">
+                <button type="submit"
+                        onclick="setFormAction('save_draft')"
+                        class="min-w-[150px] inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-full text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:text-airbnb-light hover:border-airbnb-dark focus:outline-none focus:ring-airbnb-dark">
+                    Save
+                </button>
+            </div>
         </form>
     </div>
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('radioGroup', () => ({
-                selected: null
-            }));
-        });
-    </script>
+
+    @push('scripts')
+        <script>
+            function setFormAction(action) {
+                document.getElementById('form_action').value = action;
+            }
+            document.getElementById('rulesForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = this;
+                const formData = new FormData(form);
+                const action = formData.get('form_action');
+
+                // Determine endpoint based on action
+                const endpoint = action === 'save_and_exit'
+                    ? "{{ route('property.save.all.updates', ['property' => $property->prop_id]) }}"
+                    : form.action;
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (action === 'save_and_exit') {
+                                window.location.href = data.redirect || "{{ route('host.listing') }}";
+                            } else {
+                                // Show success message
+                                const event = new CustomEvent('show-toast', {
+                                    detail: {
+                                        message: 'Rules saved to draft',
+                                        type: 'success'
+                                    }
+                                });
+                                document.dispatchEvent(event);
+                            }
+                        } else {
+                            // Show error message
+                            const event = new CustomEvent('show-toast', {
+                                detail: {
+                                    message: data.message || 'Error saving rules',
+                                    type: 'error'
+                                }
+                            });
+                            document.dispatchEvent(event);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        const event = new CustomEvent('show-toast', {
+                            detail: {
+                                message: 'An error occurred while saving',
+                                type: 'error'
+                            }
+                        });
+                        document.dispatchEvent(event);
+                    });
+            });
+        </script>
+    @endpush
+
     <style>
         /* Custom scrollbar for the dropdown */
         .time-dropdown {

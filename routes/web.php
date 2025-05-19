@@ -92,13 +92,24 @@ Route::middleware('auth')->group(function () {
         Route::prefix('property/{property}')->group(function () {
             Route::prefix('view-edit')->group(function () {
                 Route::get('/type', [PropertyEditController::class, 'viewEditType'])->name('property.edit.type');
+                Route::put('/type', [PropertyEditController::class, 'updateType'])->name('property.update.type');
                 Route::get('/location', [PropertyEditController::class, 'viewEditLocation'])->name('property.edit.location');
+                Route::put('/location', [PropertyEditController::class, 'updateLocation'])->name('property.update.location');
                 Route::get('/capacity', [PropertyEditController::class, 'viewEditCapacity'])->name('property.edit.capacity');
+                Route::put('/capacity', [PropertyEditController::class, 'updateCapacity'])->name('property.update.capacity');
                 Route::get('/description', [PropertyEditController::class, 'viewEditDescription'])->name('property.edit.description');
+                Route::put('/description', [PropertyEditController::class, 'updateDescription'])->name('property.update.description');
                 Route::get('/amenities', [PropertyEditController::class, 'viewEditAmenities'])->name('property.edit.amenities');
+                Route::put('/amenities', [PropertyEditController::class, 'updateAmenities'])->name('property.update.amenities');
                 Route::get('/pictures', [PropertyEditController::class, 'viewEditPictures'])->name('property.edit.pictures');
+                Route::put('/pictures', [PropertyEditController::class, 'updatePictures'])->name('property.update.pictures');
+                Route::delete('/pictures/{image}', [PropertyEditController::class, 'removeImage'])->name('property.remove.image');
+                Route::post('/mark-image-removal', [PropertyEditController::class, 'markImageForRemoval'])->name('property.mark.image.removal');
                 Route::get('/price', [PropertyEditController::class, 'viewEditPrice'])->name('property.edit.price');
+                Route::put('/price', [PropertyEditController::class, 'updatePrice'])->name('property.update.price');
                 Route::get('/rules', [PropertyEditController::class, 'viewEditRules'])->name('property.edit.rules');
+                Route::post('/rules', [PropertyEditController::class, 'updateRules'])->name('property.update.rules');
+                Route::post('/save-all', [PropertyEditController::class, 'saveAllUpdates'])->name('property.save.all.updates');
             });
         });
     });
