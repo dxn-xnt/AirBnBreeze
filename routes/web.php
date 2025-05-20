@@ -116,7 +116,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/price', [PropertyEditController::class, 'viewEditPrice'])->name('property.edit.price');
                 Route::put('/price', [PropertyEditController::class, 'updatePrice'])->name('property.update.price');
                 Route::get('/rules', [PropertyEditController::class, 'viewEditRules'])->name('property.edit.rules');
-                Route::post('/rules', [PropertyEditController::class, 'updateRules'])->name('property.update.rules');
+                Route::post('/rules', [PropertyEditController::class, 'createRules'])->name('property.create.rules');
                 Route::post('/save-all', [PropertyEditController::class, 'saveAllUpdates'])->name('property.save.all.updates');
             });
         });

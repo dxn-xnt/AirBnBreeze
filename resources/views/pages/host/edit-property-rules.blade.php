@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="relative w-full h-full mt-28 mb-10 bg-airbnb-light gap-2">
-        <form id="rulesForm" action="{{ route('property.update.rules', ['property' => $property->prop_id]) }}" method="POST">
+        <form id="rulesForm" action="{{ route('property.create.rules', ['property' => $property->prop_id]) }}" method="POST">
             @csrf
             <input type="hidden" name="form_action" id="form_action" value="">
 
@@ -40,6 +40,33 @@
                     // Get draft data or fall back to existing property rules
                     $draftRules = session()->get('property_draft.rules', []);
                     $propertyRules = $property->rules ?? new \App\Models\PropertyRules();
+
+                    // Helper function to get the right value
+                    function getRuleValue($key, $draftRules, $propertyRules, $default = 0) {
+                        // Map form field names to database column names
+                        $fieldMap = [
+                            'no_smoking' => 'rule_no_smoking',
+                            'no_pets' => 'rule_no_pet',
+                            'no_parties' => 'rule_no_events',
+                            'check_in_time' => 'rule_check_in',
+                            'check_out_time' => 'rule_check_out',
+                            'has_security_camera' => 'rule_security_cam',
+                            'has_carbon_monoxide_alarm' => 'rule_alarm',
+                            'must_climb_stairs' => 'rule_stairs',
+                            'has_cancellation_fee' => 'rule_cancellation',
+                            'cancellation_rate' => 'rule_cancellation_rate'
+                        ];
+
+                        $dbKey = $fieldMap[$key] ?? $key;
+
+                        // Special handling for time fields
+                        if (in_array($key, ['check_in_time', 'check_out_time'])) {
+                            $timeValue = $draftRules[$key] ?? $propertyRules->{$dbKey} ?? $default;
+                            return is_string($timeValue) ? (int)substr($timeValue, 0, 2) : $timeValue;
+                        }
+
+                        return old($key, $draftRules[$key] ?? $propertyRules->{$dbKey} ?? $default);
+                    }
                 @endphp
 
                 <div class="mb-8">
@@ -51,14 +78,14 @@
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_smoking" value="0" class="hidden peer"
-                                        {{ (old('no_smoking', $draftRules['no_smoking'] ?? $propertyRules->no_smoking ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_smoking', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_smoking" value="1" class="hidden peer"
-                                        {{ (old('no_smoking', $draftRules['no_smoking'] ?? $propertyRules->no_smoking ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_smoking', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -72,14 +99,14 @@
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_pets" value="0" class="hidden peer"
-                                        {{ (old('no_pets', $draftRules['no_pets'] ?? $propertyRules->no_pets ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_pets', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_pets" value="1" class="hidden peer"
-                                        {{ (old('no_pets', $draftRules['no_pets'] ?? $propertyRules->no_pets ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_pets', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -93,14 +120,14 @@
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_parties" value="0" class="hidden peer"
-                                        {{ (old('no_parties', $draftRules['no_parties'] ?? $propertyRules->no_parties ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_parties', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="no_parties" value="1" class="hidden peer"
-                                        {{ (old('no_parties', $draftRules['no_parties'] ?? $propertyRules->no_parties ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('no_parties', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -116,7 +143,7 @@
                                     @php
                                         $timeValue = $hour;
                                         $timeDisplay = ($hour % 12 == 0 ? 12 : $hour % 12) . ':00 ' . ($hour < 12 ? 'AM' : 'PM');
-                                        $selectedTime = old('check_in_time', $draftRules['check_in_time'] ?? $propertyRules->check_in_time ?? 13);
+                                        $selectedTime = getRuleValue('check_in_time', $draftRules, $propertyRules, 13);
                                     @endphp
                                     <option value="{{ $timeValue }}" {{ $timeValue == $selectedTime ? 'selected' : '' }}>
                                         {{ $timeDisplay }}
@@ -133,7 +160,7 @@
                                     @php
                                         $timeValue = $hour;
                                         $timeDisplay = ($hour % 12 == 0 ? 12 : $hour % 12) . ':00 ' . ($hour < 12 ? 'AM' : 'PM');
-                                        $selectedTime = old('check_out_time', $draftRules['check_out_time'] ?? $propertyRules->check_out_time ?? 12);
+                                        $selectedTime = getRuleValue('check_out_time', $draftRules, $propertyRules, 12);
                                     @endphp
                                     <option value="{{ $timeValue }}" {{ $timeValue == $selectedTime ? 'selected' : '' }}>
                                         {{ $timeDisplay }}
@@ -147,26 +174,20 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Guest Safety</h3>
                     <div class="flex-col gap-5 px-2">
-                        @php
-                            // Get draft data or fall back to existing property rules
-                            $draftRules = session()->get('property_draft.rules', []);
-                            $propertyRules = $property->rules ?? new \App\Models\PropertyRules();
-                        @endphp
-
-                            <!-- Security Camera -->
+                        <!-- Security Camera -->
                         <div class="flex items-center justify-between w-full border border-airbnb-light rounded-lg py-2">
                             <p class="text-airbnb-darkest">Security camera/recording device</p>
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="has_security_camera" value="0" class="hidden peer"
-                                        {{ (old('has_security_camera', $draftRules['has_security_camera'] ?? $propertyRules->has_security_camera ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('has_security_camera', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="has_security_camera" value="1" class="hidden peer"
-                                        {{ (old('has_security_camera', $draftRules['has_security_camera'] ?? $propertyRules->has_security_camera ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('has_security_camera', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -180,14 +201,14 @@
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="has_carbon_monoxide_alarm" value="0" class="hidden peer"
-                                        {{ (old('has_carbon_monoxide_alarm', $draftRules['has_carbon_monoxide_alarm'] ?? $propertyRules->has_carbon_monoxide_alarm ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('has_carbon_monoxide_alarm', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="has_carbon_monoxide_alarm" value="1" class="hidden peer"
-                                        {{ (old('has_carbon_monoxide_alarm', $draftRules['has_carbon_monoxide_alarm'] ?? $propertyRules->has_carbon_monoxide_alarm ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('has_carbon_monoxide_alarm', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -201,14 +222,14 @@
                             <div class="flex gap-6">
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="must_climb_stairs" value="0" class="hidden peer"
-                                        {{ (old('must_climb_stairs', $draftRules['must_climb_stairs'] ?? $propertyRules->must_climb_stairs ?? 0) == 0) ? 'checked' : '' }}>
+                                        {{ getRuleValue('must_climb_stairs', $draftRules, $propertyRules) == 0 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="x" class="h-5 w-5"></i>
                                     </div>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input type="radio" name="must_climb_stairs" value="1" class="hidden peer"
-                                        {{ (old('must_climb_stairs', $draftRules['must_climb_stairs'] ?? $propertyRules->must_climb_stairs ?? 0) == 1) ? 'checked' : '' }}>
+                                        {{ getRuleValue('must_climb_stairs', $draftRules, $propertyRules) == 1 ? 'checked' : '' }}>
                                     <div class="p-2 border border-airbnb-dark rounded-full peer-checked:bg-airbnb-dark peer-checked:text-airbnb-light">
                                         <i data-lucide="check" class="h-5 w-5"></i>
                                     </div>
@@ -221,8 +242,8 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-medium text-gray-900 mb-4">Cancellation Policy</h3>
                     @php
-                        $cancellationFee = old('has_cancellation_fee', $draftRules['has_cancellation_fee'] ?? $propertyRules->has_cancellation_fee ?? 'no');
-                        $cancellationRate = old('cancellation_rate', $draftRules['cancellation_rate'] ?? $propertyRules->cancellation_rate ?? 10);
+                        $cancellationFee = getRuleValue('has_cancellation_fee', $draftRules, $propertyRules, 'no');
+                        $cancellationRate = getRuleValue('cancellation_rate', $draftRules, $propertyRules, 10);
                     @endphp
 
                     <div x-data="{ cancellationFee: '{{ $cancellationFee }}' }" class="flex-col gap-5 px-2">
@@ -281,67 +302,79 @@
             </div>
         </form>
     </div>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @push('scripts')
         <script>
             function setFormAction(action) {
                 document.getElementById('form_action').value = action;
             }
-            document.getElementById('rulesForm').addEventListener('submit', function(e) {
+
+            document.getElementById('rulesForm')?.addEventListener('submit', function(e) {
                 e.preventDefault();
-
                 const form = this;
-                const formData = new FormData(form);
-                const action = formData.get('form_action');
 
-                // Determine endpoint based on action
-                const endpoint = action === 'save_and_exit'
-                    ? "{{ route('property.save.all.updates', ['property' => $property->prop_id]) }}"
-                    : form.action;
+                // Collect rule data from form fields
+                let checkInTime = document.querySelector('[name="check_in_time"]')?.value || '';
+                let checkOutTime = document.querySelector('[name="check_out_time"]')?.value || '';
 
-                fetch(endpoint, {
+                // Format numeric time to HH:MM:SS
+                function formatTimeToHHMMSS(time) {
+                    if (!time || isNaN(time)) return '12:00:00'; // fallback
+                    return `${String(time).padStart(2, '0')}:00:00`;
+                }
+
+                const ruleData = {
+                    check_in_time: formatTimeToHHMMSS(checkInTime),
+                    check_out_time: formatTimeToHHMMSS(checkOutTime),
+                    no_smoking: document.querySelector('[name="no_smoking"]')?.checked || false,
+                    no_pets: document.querySelector('[name="no_pets"]')?.checked || false,
+                    no_parties: document.querySelector('[name="no_parties"]')?.checked || false,
+                    has_security_camera: document.querySelector('[name="has_security_camera"]')?.checked || false,
+                    has_carbon_monoxide_alarm: document.querySelector('[name="has_carbon_monoxide_alarm"]')?.checked || false,
+                    must_climb_stairs: document.querySelector('[name="must_climb_stairs"]')?.checked || false,
+                    has_cancellation_fee: document.querySelector('[name="has_cancellation_fee"]')?.value || 'no',
+                    cancellation_rate: document.querySelector('[name="cancellation_rate"]')?.value || ''
+                };
+
+                const action = document.getElementById('form_action')?.value;
+
+                const url = "{{ route('property.save.all.updates', ['property' => $property->prop_id]) }}";
+
+                fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
-                    body: formData
+                    body: JSON.stringify({
+                        _action: action,
+                        ...ruleData
+                    })
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        // Only parse as JSON if content-type is JSON
+                        const contentType = response.headers.get("content-type");
+
+                        if (!contentType || !contentType.includes("application/json")) {
+                            return response.text().then(text => {
+                                console.error("❌ Non-JSON response received:", text);
+                                alert("Server error. Check console for details.");
+                                throw new Error("Server returned non-JSON response.");
+                            });
+                        }
+
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
-                            if (action === 'save_and_exit') {
-                                window.location.href = data.redirect || "{{ route('host.listing') }}";
-                            } else {
-                                // Show success message
-                                const event = new CustomEvent('show-toast', {
-                                    detail: {
-                                        message: 'Rules saved to draft',
-                                        type: 'success'
-                                    }
-                                });
-                                document.dispatchEvent(event);
-                            }
+                            window.location.href = data.redirect || "{{ route('host.listing') }}";
                         } else {
-                            // Show error message
-                            const event = new CustomEvent('show-toast', {
-                                detail: {
-                                    message: data.message || 'Error saving rules',
-                                    type: 'error'
-                                }
-                            });
-                            document.dispatchEvent(event);
+                            alert('Failed to save: ' + (data.message || 'Unknown error'));
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        const event = new CustomEvent('show-toast', {
-                            detail: {
-                                message: 'An error occurred while saving',
-                                type: 'error'
-                            }
-                        });
-                        document.dispatchEvent(event);
+                        console.error("🚨 Fetch error:", error);
+                        alert("An unexpected error occurred. Check console for details.");
                     });
             });
         </script>

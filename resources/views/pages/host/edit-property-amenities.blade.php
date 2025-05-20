@@ -39,9 +39,17 @@
 
             <div class="m-auto w-full max-w-screen-md p-8">
                 @php
-                    // Check for draft data first, then fall back to property data
+                    // Get amenities from draft or fallback to DB
                     $draftData = session()->get('property_draft', []);
-                    $selectedAmenities = $draftData['amenities'] ?? old('amenities', $propertyAmenities->pluck('amn_id')->toArray() ?? []);
+                    $amenitiesFromDraft = $draftData['amenities'] ?? null;
+
+                    // Determine selected amenity IDs
+                    if ($amenitiesFromDraft && is_array($amenitiesFromDraft)) {
+                        $selectedAmenities = $amenitiesFromDraft;
+                    } else {
+                        // Fallback to property amenities from DB
+                        $selectedAmenities = old('amenities', $propertyAmenities);
+                    }
                 @endphp
 
                     <!-- Basic Amenities (BA) -->
