@@ -6,14 +6,10 @@ use App\Models\Amenity;
 use App\Models\Property;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AmenityController;
 
 class PropertyController extends Controller
 {
-    /**
-     * Display a listing of properties.
-     *
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory
-     */
     public function index()
     {
         // Fetch properties with their images, hosts, and amenities
@@ -22,12 +18,6 @@ class PropertyController extends Controller
         return view('pages.home', compact('properties'));
     }
 
-    /**
-     * Show the details of a specific property.
-     *
-     * @param int $id
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory
-     */
     public function show($id)
     {
         // Fetch the property with its images, host, and amenities
@@ -51,12 +41,12 @@ class PropertyController extends Controller
                 'image' => $property->host->profile_image_url ?? 'assets/images/default-host.jpg',
             ],
             'images' => [
-                'main' => $property->images->first()?->img_url ?? 'assets/images/placeholder.jpg',
+                'main' => $property->images->first()->img_url ?? 'assets/images/placeholder.jpg',
                 'gallery' => $property->images->pluck('img_url')->toArray(),
             ],
             'amenities' => $property->amenities->map(function ($amenity) {
                 return [
-                    'icon' => $amenity->icon ?? 'default-icon', // Ensure you have an icon column in the amenities table
+                    'icon' => $amenity->icon, // Ensure you have an icon column in the amenities table
                     'name' => $amenity->name,
                 ];
             })->toArray(),
