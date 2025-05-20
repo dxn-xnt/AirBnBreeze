@@ -3,8 +3,6 @@
 @section('title', 'Your Bookings')
 
 @section('content')
-    <x-layout.bookings-header />
-
     <!-- success message container -->
     @if(session('success'))
         <div class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-airbnb-light-500 text-airbnb-darkest px-6 py-3 rounded-lg z-50 animate-fade-in-out">
@@ -19,19 +17,16 @@
             <h1 class="text-[32px] font-semibold text-airbnb-darkest mb-1">Bookings</h1>
 
             <!-- Booking Tabs -->
-            <div class="flex gap-3 mb-8">
+            <div class="flex gap-3 mb-4">
                 <a href="{{ route('bookings.category', ['category' => 'upcoming']) }}"
-                   class="{{ $category === 'upcoming' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} py-1.5 px-5 rounded-xl text-sm font-medium">Upcoming</a>
+                   class="{{ $category === 'upcoming' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Upcoming</a>
                 <a href="{{ route('bookings.category', ['category' => 'pending']) }}"
-                   class="{{ $category === 'pending' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} py-1.5 px-5 rounded-xl text-sm font-medium">Pending</a>
+                   class="{{ $category === 'pending' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Pending</a>
                 <a href="{{ route('bookings.category', ['category' => 'recent']) }}"
-                   class="{{ $category === 'recent' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} py-1.5 px-5 rounded-xl text-sm font-medium">Recent</a>
+                   class="{{ $category === 'recent' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Recent</a>
                 <a href="{{ route('bookings.category', ['category' => 'cancelled']) }}"
-                   class="{{ $category === 'cancelled' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} py-1.5 px-5 rounded-xl text-sm font-medium">Cancelled</a>
+                   class="{{ $category === 'cancelled' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Cancelled</a>
             </div>
-
-            <!-- Category Title -->
-            <h2 class="text-lg font-medium text-airbnb-darkest mb-4 capitalize">{{ $category }} Bookings</h2>
 
             <!-- Booking Cards -->
             <div class="space-y-5 mb-2">
@@ -68,11 +63,6 @@
                                     ₱{{ number_format($booking->book_total_price, 2) }}
                                 </div>
 
-                                <div class="text-xs text-gray-600 italic mb-none">Status</div>
-                                <div class="text-base font-medium text-airbnb-darkest">
-                                    {{ ucfirst($booking->book_status) }}
-                                </div>
-
                                 <div class="text-xs text-gray-600 italic mb-none">Notes</div>
                                 <div class="text-base font-medium text-airbnb-darkest">
                                     {{ $booking->book_notes ?? 'No notes' }}
@@ -101,16 +91,17 @@
                         </div>
                     </div>
                 @empty
-                    <div class="bg-airbnb-light rounded-xl border border-airbnb-darkest p-8 text-center">
+                    <div class="pt-8 text-center">
                         <p class="text-airbnb-darkest text-lg">No {{ $category }} bookings found.</p>
                     </div>
                 @endforelse
             </div>
 
             <!-- Add More Bookings -->
-            <div class="text-center mt-10">
-                <p class="text-[0.75rem] text-[#375534] mb-[0.5rem]">Add more booking trips?</p>
-                <a href="{{ route('home') }}" class="bg-airbnb-dark text-white py-2 px-10 rounded-full hover:bg-opacity-90">
+            <!-- Explore More Section -->
+            <div class="text-center py-4 pb-6 md:pb-8 max-w-[1200px] mx-auto px-4 sm:px-6">
+                <p class="mb-3 text-gray-600 italic text-sm sm:text-base">Add more booking trips?</p>
+                <a href="{{ route('home') }}" class="bg-airbnb-darkest text-airbnb-light py-2 px-5 sm:py-2.5 sm:px-6 border-none rounded-3xl cursor-pointer text-sm sm:text-base hover:bg-opacity-90 active:scale-95 transition-all duration-200 ease-out">
                     Browse
                 </a>
             </div>

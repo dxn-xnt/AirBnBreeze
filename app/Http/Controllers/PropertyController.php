@@ -6,12 +6,12 @@ use App\Models\Amenity;
 use App\Models\Property;
 use App\Models\Type;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AmenityController;
 
 class PropertyController extends Controller
 {
     public function index()
     {
+        session()->forget('search_results');
         // Fetch properties with their images, hosts, and amenities
         $properties = Property::with(['images', 'host', 'amenities'])->get();
         return view('pages.home', compact('properties'));
@@ -83,25 +83,21 @@ class PropertyController extends Controller
 
         // Base query with eager loading
         $query = Property::with(['images', 'host', 'amenities'])
-            ->where('city', 'like', '%' . $validated['location'] . '%')
+            ->where('prop_address', 'like', '%' . $validated['location'] . '%')
             ->where('prop_room_count', '>=', $validated['rooms'])
             ->where('prop_max_guest', '>=', $validated['guests']);
 
-        // Filter out properties with existing bookings that conflict with the selected dates
-        $query->whereDoesntHave('bookings', function($q) use ($validated) {
-            $q->where(function($query) use ($validated) {
-                $query->whereBetween('check_in', [$validated['check_in'], $validated['check_out']])
-                    ->orWhereBetween('check_out', [$validated['check_in'], $validated['check_out']])
-                    ->orWhere(function($q) use ($validated) {
-                        $q->where('check_in', '<=', $validated['check_in'])
-                            ->where('check_out', '>=', $validated['check_out']);
-                    });
-            })->whereIn('status', ['confirmed', 'pending']);
-        });
-
         $properties = $query->get();
 
-        // Pass the search parameters back to the view to repopulate the form
+        // Store in session
+        session([
+            'search_results' => [
+                'properties' => $properties,
+                'params' => $validated,
+                'timestamp' => now()
+            ]
+        ]);
+
         return view('pages.home', [
             'properties' => $properties,
             'searchParams' => $validated

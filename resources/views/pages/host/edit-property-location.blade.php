@@ -166,4 +166,3 @@
     @endpush
 @endsection
 
-@extends('layouts.app')

@@ -1,6 +1,5 @@
 <div class="w-full max-w-[1400px] mx-auto px-4 z-10 relative">
-    <!-- Add form element with action/method -->
-    <form id="searchForm" action="{{ route('properties.search') }}" method="POST">
+    <form id="searchForm" action="{{ route('property.search') }}" method="GET">
         <div style="filter: drop-shadow(0px 8px 10px rgba(0, 0, 0, 0.3));" class="overflow-visible">
             <div class="bg-airbnb-light flex items-center w-full rounded-full overflow-x-auto md:overflow-hidden min-w-[300px] md:min-w-[600px] scrollbar-hide">
                 <!-- Place Location -->
@@ -11,7 +10,7 @@
                         <input
                             type="text"
                             name="location"
-                            value="Cebu City"
+                            value="{{ session('search_results.params.location') ?? 'Cebu City' }}"
                             class="input-field text-xl font-medium text-airbnb-darkest"
                             required
                         >
@@ -26,8 +25,8 @@
                             type="date"
                             name="check_in"
                             class="input-field text-xl font-medium text-airbnb-darkest"
-                            min="<?php echo date('Y-m-d'); ?>"
-                            value="<?php echo date('Y-m-d'); ?>"
+                            min="{{ date('Y-m-d') }}"
+                            value="{{ session('search_results.params.check_in') ?? date('Y-m-d') }}"
                             required
                         >
                     </div>
@@ -41,8 +40,8 @@
                             type="date"
                             name="check_out"
                             class="input-field text-xl font-medium text-airbnb-darkest"
-                            min="<?php echo date('Y-m-d'); ?>"
-                            value="<?php echo date('Y-m-d'); ?>"
+                            min="{{ date('Y-m-d') }}"
+                            value="{{ session('search_results.params.check_out') ?? date('Y-m-d', strtotime('+1 day')) }}"
                             required
                         >
                     </div>
@@ -52,22 +51,20 @@
                 <div class="flex-shrink-0 flex-1 border-r border-gray-900 py-1 px-2 min-h-[50px] min-w-[150px]">
                     <div class="text-sm text-[#6e7672] mb-1">Room & Guest</div>
                     <div class="flex items-center gap-2">
-                        <i class="w-6 h-6 text-airbnb-darkest" data-lucide="door-open"></i>
+                        <i class="w-6 h-6 text-housify-darkest" data-lucide="door-open"></i>
                         <input
                             type="number"
                             name="rooms"
-                            value="2"
+                            value="{{ session('search_results.params.rooms') ?? '2' }}"
                             min="1"
-                            class="number-input-hidden-arrows w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium"
-                        >
-                        <i class="w-6 h-6 text-airbnb-darkest" data-lucide="users"></i>
+                            class="number-input-hidden-arrows w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium">
+                        <i class="w-6 h-6 text-housify-darkest" data-lucide="users"></i>
                         <input
                             type="number"
                             name="guests"
-                            value="5"
+                            value="{{ session('search_results.params.guests') ?? '5' }}"
                             min="1"
-                            class="number-input-hidden-arrows w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium"
-                        >
+                            class="number-input-hidden-arrows w-[30px] text-center bg-transparent border-none outline-none text-xl mr-[10px] font-medium">
                     </div>
                 </div>
 
@@ -90,19 +87,36 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('searchForm');
 
-            // Optional: Add form validation before submission
-            form.addEventListener('submit', function(e) {
-                const checkIn = form.querySelector('input[name="check_in"]');
-                const checkOut = form.querySelector('input[name="check_out"]');
+            // Set default check_out to tomorrow if not in session
+            const checkIn = form.querySelector('input[name="check_in"]');
+            const checkOut = form.querySelector('input[name="check_out"]');
 
-                // Validate check-out is after check-in
+            if (!checkOut.value) {
+                const tomorrow = new Date(checkIn.value);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                checkOut.valueAsDate = tomorrow;
+            }
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
                 if (new Date(checkOut.value) <= new Date(checkIn.value)) {
                     e.preventDefault();
                     alert('Departure date must be after arrival date');
                     return false;
                 }
-
                 return true;
+            });
+
+            // Update min check_out when check_in changes
+            checkIn.addEventListener('change', function() {
+                const minDate = new Date(this.value);
+                minDate.setDate(minDate.getDate() + 1);
+                checkOut.min = minDate.toISOString().split('T')[0];
+
+                // Auto-update check_out if it's now invalid
+                if (new Date(checkOut.value) <= new Date(this.value)) {
+                    checkOut.valueAsDate = minDate;
+                }
             });
         });
     </script>
@@ -117,7 +131,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Style date picker arrow */
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(0.5);
         }

@@ -205,7 +205,7 @@ class PropertyCreationController extends Controller
     }
 
 
-    public function storePriceAndSaveProperty(Request $request)
+    public function storePriceAndSave(Request $request)
     {
         // Validate price input
         $validated = $request->validate([
