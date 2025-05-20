@@ -40,33 +40,40 @@
                 <div class="px-6 py-8">
                     <p class="text-xl text-airbnb-darkest mb-2 ml-24">Set price for the property</p>
 
-                    <div class="flex-col bg-airbnb-lightest justify-items-center">
-                        <div class="py-1 px-1 flex align-bottom items-end">
-                            <span class="text-airbnb-darkest text-[2rem] align-bottom pb-5">₱</span>
-                            <input type="text"
-                                   name="prop_price_per_night"
-                                   id="price"
-                                   value="{{ number_format((int)old('prop_price_per_night', session('property_draft.price.prop_price_per_night', $property->prop_price_per_night ?? 0)), 0, '', '') }}"
-                                   class="text-[5rem] max-w-[300px] h-21 align-bottom font-semibold text-center bg-airbnb-light appearance-none focus:outline-none"
-                                   min="1"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); formatPriceInput(this);">
-                        </div>
-                        <span class="text-airbnb-dark text-md">rate per night</span>
+                    <!-- Display current price dynamically -->
+                    <div id="current-price-display" class="text-center mb-4">
+                        Current Price: ₱{{ number_format((float)($property->prop_price_per_night ?? 0), 2) }}
                     </div>
 
-                    @error('prop_price_per_night')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-
-                    @if($errors->any())
-                        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                    <form id="priceForm" method="POST" action="{{ route('property.update.price', ['property' => $property->prop_id]) }}">
+                        @csrf
+                        <input type="hidden" name="form_action" id="form_action" value="">
+                        <div class="flex-col bg-airbnb-lightest justify-items-center">
+                            <div class="py-1 px-1 flex align-bottom items-end">
+                                <span class="text-airbnb-darkest text-[2rem] align-bottom pb-5">₱</span>
+                                <input type="text"
+                                       name="prop_price_per_night"
+                                       id="price"
+                                       value="{{ number_format((float)(old('prop_price_per_night') ?? session('property_draft.price.prop_price_per_night', $property->prop_price_per_night ?? 0)), 0, '', '') }}"
+                                       class="text-[5rem] max-w-[300px] h-21 font-semibold text-center bg-airbnb-light appearance-none focus:outline-none"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); formatPriceInput(this);">
+                            </div>
+                            <span class="text-airbnb-dark text-md">rate per night</span>
                         </div>
-                    @endif
+
+                        @error('prop_price_per_night')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+
+                        @if ($errors->any())
+                            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                 </div>
             </div>
             <div class="flex gap-3 mt-6 max-w-screen-xl justify-end">
@@ -133,7 +140,13 @@
                             if (action === 'save_and_exit') {
                                 window.location.href = data.redirect || "{{ route('host.listing') }}";
                             } else {
-                                // Show success message
+                                // ✅ Update displayed price dynamically
+                                const priceDisplay = document.getElementById('current-price-display');
+                                if (priceDisplay && data.price !== undefined) {
+                                    priceDisplay.textContent = 'Current Price: ₱' + parseFloat(data.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                }
+
+                                // Show success toast
                                 const event = new CustomEvent('show-toast', {
                                     detail: {
                                         message: 'Price saved to draft',
@@ -143,7 +156,6 @@
                                 document.dispatchEvent(event);
                             }
                         } else {
-                            // Show error message
                             const event = new CustomEvent('show-toast', {
                                 detail: {
                                     message: data.message || 'Error saving price',

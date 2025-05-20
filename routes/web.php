@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HostController;
 use App\Http\Controllers\PropertyEditController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\LogInController;
@@ -14,12 +14,13 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', [PropertyController::class, 'index'])->name('home');
 Route::get('/result', [PropertyController::class, 'search'])->name('property.search');
 Route::get('/property/{id}', [PropertyController::class, 'show'])->name('property.show');
+Route::view('/about', 'pages.about-us')->name('about');
+Route::view('/help', 'pages.help-center')->name('help');
 
 // Public Routes
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [LogInController::class, 'login'])->name('user.login');
-
     Route::get('/signup', [UserController::class, 'showSignUp'])->name('signup');
     Route::post('/user/create', [UserController::class, 'createUser'])->name('user.create');
 });
@@ -34,18 +35,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/{category}', [BookingController::class, 'index'])->name('bookings.category');
     Route::get('/bookings/details/{id}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
-
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
     Route::put('/profile/update/{id}', [UserController::class, 'updateProfile'])->name('owner.update');
+    Route::view('/favorites', 'pages.Favorites')->name('favorites');
+    Route::get('/profile-view', [UserController::class, 'viewProfile'])->name('profile.view');
 
-    // Move booking process routes here inside auth middleware
-    Route::get('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
-    Route::get('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
-    Route::post('/property/{id}/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
-    Route::get('/property/{id}/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
+    // Booking Routes
+    Route::prefix('bookings')->group(function () {
+        Route::get('/', [BookingController::class, 'index'])->name('bookings.index');
+        Route::get('/{id}', [BookingController::class, 'show'])->name('bookings.show');
+        Route::post('/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    });
 
-    // Notifications
+    // Property Booking Process
+    Route::prefix('property/{id}')->group(function () {
+        Route::get('/book', [BookingController::class, 'book'])->name('bookings.book');
+        Route::post('/book', [BookingController::class, 'book'])->name('bookings.book');
+        Route::get('/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
+        Route::post('/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
+        Route::get('/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
+    });
+
+    // Notification Routes
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
@@ -132,7 +144,7 @@ Route::get('/help', function () {
     return view('pages.HelpCenter');
 })->name('help');
 
-// Fallback route
+// Fallback Route
 Route::fallback(function () {
     return view('pages.404');
 });
