@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenity;
 use App\Models\Property;
+use App\Models\PropertyAmenity;
+use App\Models\PropertyImage;
+use App\Models\PropertyRules;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PropertyController extends Controller
 {
     public function index()
     {
         session()->forget('search_results');
+        BookingController::updateBookingStatuses();
         // Fetch properties with their images, hosts, and amenities
         $properties = Property::with(['images', 'host', 'amenities'])->get();
         return view('pages.home', compact('properties'));
     }
+
+
 
     public function show($id)
     {
@@ -102,6 +109,26 @@ class PropertyController extends Controller
             'properties' => $properties,
             'searchParams' => $validated
         ]);
+    }
+
+    public function destroy(Property $property)
+    {
+        // Authorization check (only owner can delete)
+        if ($property->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($property) {
+            // Delete related records first
+            PropertyImage::where('prop_id', $property->prop_id)->delete();
+            PropertyAmenity::where('prop_id', $property->prop_id)->delete();
+            PropertyRules::where('prop_id', $property->prop_id)->delete();
+
+            // Then delete the property
+            $property->delete();
+        });
+
+        return response()->json(['success' => true]);
     }
 
 }

@@ -66,7 +66,7 @@
                                     </div>
                                     <div class="text-xs text-airbnb-darkest italic">Booker Name</div>
                                 </div>
-                                <img src="{{ asset($booking->user->user_profile ? 'storage/'.$booking->user->user_profile : 'images/default-profile.png') }}"
+                                <img src="{{ asset($booking->user->user_profile ? 'storage/'.$booking->user->user_profile : null) }}"
                                      alt="User"
                                      class="h-10 w-10 rounded-full object-cover">
                             </div>
@@ -84,7 +84,7 @@
                                     </button>
                                     <button class="approve-btn text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:shadow-md py-[1px] px-4 rounded-full"
                                             data-booking-id="{{ $booking->book_id }}">
-                                        Pre-Approve
+                                        Approve
                                     </button>
                                 </div>
                             </div>
@@ -148,7 +148,7 @@
                     }
 
                     if (confirm('Are you sure you want to approve this booking?')) {
-                        fetch(`/host/bookings/${bookingId}/approve`, {  // Notice the correct URL construction
+                        fetch(`/host/bookings/${bookingId}`, {  // Notice the correct URL construction
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

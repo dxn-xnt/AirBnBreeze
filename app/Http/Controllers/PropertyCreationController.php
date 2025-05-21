@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amenity;
+use App\Models\PropertyRules;
 use App\Models\Type;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -304,8 +305,23 @@ class PropertyCreationController extends Controller
                 ]);
             }
 
+            // Save default property rules
+            PropertyRules::create([
+                'prop_id' => $property->prop_id,
+                'rule_check_in' => '13:00:00',
+                'rule_check_out' => '12:00:00',
+                'rule_no_smoking' => false,
+                'rule_no_pet' => false,
+                'rule_no_events' => false,
+                'rule_security_cam' => false,
+                'rule_alarm' => false,
+                'rule_stairs' => false,
+                'rule_cancellation' => false,
+                'rule_cancellation_rate' => null,
+            ]);
+
             $user = User::find(auth()->id());
-            $user->user_is_host = True;
+            $user->user_is_host = true;
             $user->save();
 
             \DB::commit();

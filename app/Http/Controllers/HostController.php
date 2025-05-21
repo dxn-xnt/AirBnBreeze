@@ -26,6 +26,7 @@ class HostController extends Controller
 
     public function viewPendingBookings()
     {
+        BookingController::updateBookingStatuses();
         $bookings = Booking::with(['property', 'user'])
             ->whereHas('property', function($query) {
                 $query->where('user_id', auth()->id());
@@ -140,7 +141,7 @@ class HostController extends Controller
             ->where('book_status', 'ongoing')
             ->orderBy('book_date_created', 'desc')
             ->get();
-        return view('pages.host.accepted-bookings', compact('bookings'));
+        return view('pages.host.ongoing-bookings', compact('bookings'));
     }
     public function viewCompletedBookings(){
         $bookings = Booking::with(['property', 'user'])

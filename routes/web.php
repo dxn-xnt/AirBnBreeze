@@ -88,8 +88,10 @@ Route::prefix('property/create')->middleware(['auth'])->group(function () {
 
 Route::prefix('host')->middleware(['auth'])->group(function () {
     // General host routes
-    Route::get('/listing', [HostController::class, 'viewListing'])->name('host.listing');
-    Route::get('/bookings', [PropertyCreationController::class, 'createProperty_step1'])->name('host.bookings');
+    Route::prefix('/listing')->group(function () {
+        Route::get('', [HostController::class, 'viewListing'])->name('host.listing');
+        Route::delete('/{property}', [PropertyController::class, 'destroy'])->name('property.delete');
+    });
 
     Route::prefix('bookings')->group(function () {
         Route::get('/pending', [HostController::class, 'viewPendingBookings'])->name('host.bookings.pending');

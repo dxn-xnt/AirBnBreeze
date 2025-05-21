@@ -6,6 +6,7 @@ use App\Models\Property;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 
@@ -14,6 +15,7 @@ class BookingController extends Controller
     // Display the user's bookings
     public function index(Request $request, $category = null)
     {
+        BookingController::updateBookingStatuses();
         // Get current user ID
         $userId = Auth::id();
 
@@ -130,5 +132,40 @@ class BookingController extends Controller
 
         return redirect()->route('bookings.category', ['category' => 'cancelled'])
             ->with('success', 'Booking has been cancelled successfully.');
+    }
+
+    public static function updateBookingStatuses(): void
+    {
+        $now = now()->format('Y-m-d H:i:s');
+
+        // Get all bookings that need status updates
+        $bookings = Booking::whereIn('book_status', ['accepted', 'ongoing'])
+            ->orWhereNull('book_status')
+            ->get();
+
+        foreach ($bookings as $booking) {
+            // Get property rules for this booking
+            $rules = DB::table('property_rules')
+                ->where('prop_id', $booking->prop_id)
+                ->first();
+
+            if (!$rules) continue;
+
+            // Combine dates with times
+            $checkIn = $booking->book_check_in . ' ' . $rules->rule_check_in;
+            $checkOut = $booking->book_check_out . ' ' . $rules->rule_check_out;
+
+            // Compare with current time
+            if ($now >= $checkIn && $now <= $checkOut) {
+                if ($booking->book_status != 'ongoing') {
+                    $booking->update(['book_status' => 'ongoing']);
+                }
+            }
+            elseif ($now > $checkOut) {
+                if ($booking->book_status != 'completed') {
+                    $booking->update(['book_status' => 'completed']);
+                }
+            }
+        }
     }
 }
