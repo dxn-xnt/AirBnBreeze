@@ -26,6 +26,8 @@
                    class="{{ $category === 'recent' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Recent</a>
                 <a href="{{ route('bookings.category', ['category' => 'cancelled']) }}"
                    class="{{ $category === 'cancelled' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Cancelled</a>
+                <a href="{{ route('bookings.category', ['category' => 'ongoing']) }}"
+                   class="{{ $category === 'ongoing' ? 'bg-airbnb-dark text-airbnb-light' : 'bg-airbnb-light text-airbnb-darkest border border-airbnb-darkest' }} p-2 rounded-lg">Ongoing</a>
             </div>
 
             <!-- Booking Cards -->
