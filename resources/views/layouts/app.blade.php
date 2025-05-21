@@ -26,12 +26,11 @@
 <!-- Header (includes sticky search bar functionality) -->
 
 @if(\Request::is('host*'))
-    <x-layout.host-header />      
-@elseif(!\Request::is('bookings*'))
-    <x-layout.header />
+    <x-layout.host-header />
 @else
-    <x-layout.bookings-header />
+    <x-layout.header />
 @endif
+
 <!-- Page Content -->
 <main>
     @yield('content')

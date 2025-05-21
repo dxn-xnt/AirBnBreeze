@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
-
 @section('title', 'Home')
-
 
 @section('content')
     <!-- Home -->
@@ -47,9 +45,9 @@
         <!-- Explore More Section -->
         <div class="text-center py-4 pb-6 md:pb-8 max-w-[1200px] mx-auto px-4 sm:px-6">
             <p class="mb-3 text-gray-600 italic text-sm sm:text-base">Continue explore related airbnbs?</p>
-            <button class="bg-airbnb-darkest text-airbnb-light py-2 px-5 sm:py-2.5 sm:px-6 border-none rounded-3xl cursor-pointer text-sm sm:text-base hover:bg-opacity-90 active:scale-95 transition-all duration-200 ease-out">
+            <a href="{{ route('home') }}" class="bg-airbnb-darkest text-airbnb-light py-2 px-5 sm:py-2.5 sm:px-6 border-none rounded-3xl cursor-pointer text-sm sm:text-base hover:bg-opacity-90 active:scale-95 transition-all duration-200 ease-out">
                 Show More
-            </button>
+            </a>
         </div>
     </div>
 

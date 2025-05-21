@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenity;
 use App\Models\Property;
+use App\Models\PropertyAmenity;
+use App\Models\PropertyImage;
+use App\Models\PropertyRules;
 use App\Models\Type;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AmenityController;
+use Illuminate\Support\Facades\DB;
 
 class PropertyController extends Controller
 {
     public function index()
     {
+        session()->forget('search_results');
+        BookingController::updateBookingStatuses();
         // Fetch properties with their images, hosts, and amenities
         $properties = Property::with(['images', 'host', 'amenities'])->get();
-
         return view('pages.home', compact('properties'));
     }
+
+
 
     public function show($id)
     {
@@ -71,4 +77,58 @@ class PropertyController extends Controller
 
         return view('pages.property-details', compact('data'));
     }
+
+    public function search(Request $request)
+    {
+        $validated = $request->validate([
+            'location' => 'required|string',
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+            'rooms' => 'required|integer|min:1',
+            'guests' => 'required|integer|min:1'
+        ]);
+
+        // Base query with eager loading
+        $query = Property::with(['images', 'host', 'amenities'])
+            ->where('prop_address', 'like', '%' . $validated['location'] . '%')
+            ->where('prop_room_count', '>=', $validated['rooms'])
+            ->where('prop_max_guest', '>=', $validated['guests']);
+
+        $properties = $query->get();
+
+        // Store in session
+        session([
+            'search_results' => [
+                'properties' => $properties,
+                'params' => $validated,
+                'timestamp' => now()
+            ]
+        ]);
+
+        return view('pages.home', [
+            'properties' => $properties,
+            'searchParams' => $validated
+        ]);
+    }
+
+    public function destroy(Property $property)
+    {
+        // Authorization check (only owner can delete)
+        if ($property->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($property) {
+            // Delete related records first
+            PropertyImage::where('prop_id', $property->prop_id)->delete();
+            PropertyAmenity::where('prop_id', $property->prop_id)->delete();
+            PropertyRules::where('prop_id', $property->prop_id)->delete();
+
+            // Then delete the property
+            $property->delete();
+        });
+
+        return response()->json(['success' => true]);
+    }
+
 }

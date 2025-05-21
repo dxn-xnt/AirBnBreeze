@@ -7,48 +7,53 @@
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <h1 class="text-2xl sm:text-2.5xl font-semibold text-airbnb-darkest">Booking Requests</h1>
-            <div class="flex flex-1 max-w-2xl">
-                <x-host-search-bar />
-            </div>
         </div>
 
         <!-- Filter Tabs -->
         <div class="flex space-x-2 mb-4 overflow-x-auto">
             <a href="{{ route('host.bookings.pending') }}" class="p-2 border-[1px] border-airbnb-dark bg-airbnb-dark rounded-lg text-airbnb-light">Pending</a>
             <a href="{{ route('host.bookings.accepted') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Accepted</a>
+            <a href="{{ route('host.bookings.ongoing') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Ongoing</a>
             <a href="{{ route('host.bookings.completed') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Completed</a>
             <a href="{{ route('host.bookings.cancelled') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Cancelled</a>
         </div>
 
         <!-- Booking Requests -->
         <div class="space-y-4">
-            <!-- Booking Card Component -->
-            @foreach([1, 2] as $booking)
+            @forelse($bookings as $booking)
                 <div class="bg-transparent border border-black rounded-lg p-5 shadow">
                     <div class="flex flex-col md:flex-row justify-between">
                         <!-- Booking Details -->
                         <div class="flex-1">
                             <div class="text-xs text-airbnb-darkest italic">Booking for</div>
-                            <h2 class="text-lg font-semibold mb-3">Limosnero's Private House</h2>
+                            <h2 class="text-lg font-semibold mb-3">{{ $booking->property->prop_title }}</h2>
 
                             <div class="grid grid-cols-3 gap-4 mb-4">
                                 <div>
                                     <div class="text-xs text-airbnb-darkest italic">Guests</div>
-                                    <div class="font-medium">2 adults, 1 child</div>
+                                    <div class="font-medium">
+                                        {{ $booking->book_adult_count }} {{ Str::plural('adult', $booking->book_adult_count) }},
+                                        {{ $booking->book_child_count }} {{ Str::plural('child', $booking->book_child_count) }}
+                                    </div>
                                 </div>
                                 <div>
                                     <div class="text-xs text-airbnb-darkest italic">Schedule</div>
-                                    <div class="font-medium">April 24 - 30, 2025</div>
+                                    <div class="font-medium">
+                                        {{ \Carbon\Carbon::parse($booking->book_check_in)->format('M d') }} -
+                                        {{ \Carbon\Carbon::parse($booking->book_check_out)->format('M d, Y') }}
+                                    </div>
                                 </div>
                                 <div>
                                     <div class="text-xs text-airbnb-darkest italic">Price</div>
-                                    <div class="font-medium">₱17,100.00</div>
+                                    <div class="font-medium">₱{{ number_format($booking->book_total_price, 2) }}</div>
                                 </div>
                             </div>
 
                             <div class="mb-5">
                                 <div class="text-xs text-airbnb-darkest italic">Message</div>
-                                <div class="text-airbnb-darkest">Can I request for extra mattress?</div>
+                                <div class="text-airbnb-darkest">
+                                    {{ $booking->book_notes ?? 'None' }}
+                                </div>
                             </div>
                         </div>
 
@@ -56,36 +61,150 @@
                         <div class="mt-4 md:mt-0 md:ml-4 flex flex-col items-end gap-1">
                             <div class="flex items-center mb-2">
                                 <div class="mr-3 text-right">
-                                    <div class="font-semibold">Donesia Pacquio</div>
+                                    <div class="font-semibold">
+                                        {{ $booking->user->user_fname }} {{ $booking->user->user_lname }}
+                                    </div>
                                     <div class="text-xs text-airbnb-darkest italic">Booker Name</div>
                                 </div>
-                                <img src="{{ asset('images/MD.png') }}" alt="User" class="h-10 w-10 rounded-full object-cover">
+                                <img src="{{ asset($booking->user->user_profile ? 'storage/'.$booking->user->user_profile : null) }}"
+                                     alt="User"
+                                     class="h-10 w-10 rounded-full object-cover">
                             </div>
                             <div class="flex flex-col h-full justify-between items-end">
-                                <button class="text-airbnb-darkest text-xs  border border-airbnb-darkest hover:shadow-md mb-4 px-2 rounded-full">
+                                <button class="text-airbnb-darkest text-xs border border-airbnb-darkest hover:shadow-md mb-4 px-2 rounded-full contact-details-btn"
+                                        data-email="{{ $booking->user->user_email }}"
+                                        data-phone="{{ $booking->user->user_contact_number }}">
                                     View Contact Details
                                 </button>
 
                                 <div class="flex space-x-2">
-                                    <button class="text-airbnb-darkest border border-airbnb-darkest hover:border-airbnb-dark hover:text-airbnb-dark hover:shadow-md py-[1px] px-4 rounded-full">Decline</button>
-                                    <button class="text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:shadow-md py-[1px] px-4 rounded-full">Pre-Approve</button>
+                                    <button class="decline-btn text-airbnb-darkest border border-airbnb-darkest hover:border-airbnb-dark hover:text-airbnb-dark hover:shadow-md py-[1px] px-4 rounded-full"
+                                            data-booking-id="{{ $booking->book_id }}">
+                                        Decline
+                                    </button>
+                                    <button class="approve-btn text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:shadow-md py-[1px] px-4 rounded-full"
+                                            data-booking-id="{{ $booking->book_id }}">
+                                        Approve
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="p-8 text-center">
+                    <div class="text-gray-500">No pending bookings found</div>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- Contact Details Modal -->
+    <div id="contactModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full">
+            <h3 class="text-lg font-semibold mb-4">Contact Details</h3>
+            <div class="space-y-2">
+                <div>
+                    <span class="font-medium">Email:</span>
+                    <span id="contact-email"></span>
+                </div>
+                <div>
+                    <span class="font-medium">Phone:</span>
+                    <span id="contact-phone"></span>
+                </div>
+            </div>
+            <button id="closeModal" class="mt-4 px-4 py-2 bg-airbnb-dark text-white rounded-md">Close</button>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.filter-tab');
+            // Contact Details Modal (unchanged)
+            const contactBtns = document.querySelectorAll('.contact-details-btn');
+            const contactModal = document.getElementById('contactModal');
+            const contactEmail = document.getElementById('contact-email');
+            const contactPhone = document.getElementById('contact-phone');
+            const closeModal = document.getElementById('closeModal');
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
+            contactBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    contactEmail.textContent = this.dataset.email;
+                    contactPhone.textContent = this.dataset.phone || 'Not provided';
+                    contactModal.classList.remove('hidden');
+                });
+            });
+
+            closeModal.addEventListener('click', function() {
+                contactModal.classList.add('hidden');
+            });
+
+            // Booking Actions - Fixed version
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookingId = this.dataset.bookingId;
+                    if (!bookingId) {
+                        console.error('No booking ID found');
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to approve this booking?')) {
+                        fetch(`/host/bookings/${bookingId}`, {  // Notice the correct URL construction
+                            method: 'PATCH',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                // You can add any additional data here if needed
+                            })
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                } else {
+                                    alert(data.message || 'Failed to approve booking');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while approving the booking');
+                            });
+                    }
+                });
+            });
+
+            document.querySelectorAll('.decline-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookingId = this.dataset.bookingId;
+                    if (confirm('Are you sure you want to decline this booking?')) {
+                        fetch(`/host/bookings/${bookingId}/decline`, {
+                            method: 'PATCH',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                } else {
+                                    alert(data.message || 'Failed to decline booking');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while declining the booking');
+                            });
+                    }
                 });
             });
         });
