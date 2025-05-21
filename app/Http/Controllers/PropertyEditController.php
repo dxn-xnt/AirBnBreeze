@@ -257,7 +257,8 @@ class PropertyEditController extends Controller
     // Rules View and Update
     public function viewEditRules(Property $property)
     {
-        return view('pages.host.edit-property-rules', compact('property'));
+        $propertyRules = PropertyRules::where('prop_id', $property->prop_id)->get();
+        return view('pages.host.edit-property-rules', compact('property', 'propertyRules'));
     }
 
     public function createRules(Request $request, Property $property)

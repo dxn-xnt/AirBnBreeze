@@ -13,7 +13,7 @@
                         Listing Editor
                     </h2>
                     <div class="flex gap-3">
-                        <a href="{{ url()->previous() }}" class="min-w-[150px] inline-flex justify-center py-2 px-4 border-[1px] border-airbnb-dark shadow-sm text-lg font-medium rounded-full text-airbnb-dark bg-airbnb-light hover:text-airbnb-darkest hover:border-airbnb-darkest focus:outline-none focus:ring-airbnb-light">
+                        <a href="{{ route('host.listing') }}" class="min-w-[150px] inline-flex justify-center py-2 px-4 border-[1px] border-airbnb-dark shadow-sm text-lg font-medium rounded-full text-airbnb-dark bg-airbnb-light hover:text-airbnb-darkest hover:border-airbnb-darkest focus:outline-none focus:ring-airbnb-light">
                             Back
                         </a>
                         <button type="submit"
@@ -39,11 +39,6 @@
             <div class="m-auto w-full max-w-screen-sm px-8">
                 <div class="px-6 py-8">
                     <p class="text-xl text-airbnb-darkest mb-2 ml-24">Set price for the property</p>
-
-                    <!-- Display current price dynamically -->
-                    <div id="current-price-display" class="text-center mb-4">
-                        Current Price: ₱{{ number_format((float)($property->prop_price_per_night ?? 0), 2) }}
-                    </div>
 
                     <form id="priceForm" method="POST" action="{{ route('property.update.price', ['property' => $property->prop_id]) }}">
                         @csrf

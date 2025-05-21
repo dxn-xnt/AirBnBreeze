@@ -12,8 +12,8 @@
         <!-- Filter Tabs -->
         <div class="flex space-x-2 mb-4 overflow-x-auto">
             <a href="{{ route('host.bookings.pending') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Pending</a>
-            <a href="{{ route('host.bookings.accepted') }}" class="p-2 border-[1px] border-airbnb-dark bg-airbnb-dark rounded-lg text-airbnb-light">Accepted</a>
-            <a href="{{ route('host.bookings.ongoing') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Ongoing</a>
+            <a href="{{ route('host.bookings.accepted') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Accepted</a>
+            <a href="{{ route('host.bookings.ongoing') }}" class="p-2 border-[1px] border-airbnb-dark bg-airbnb-dark rounded-lg text-airbnb-light">Ongoing</a>
             <a href="{{ route('host.bookings.completed') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Completed</a>
             <a href="{{ route('host.bookings.cancelled') }}" class="p-2 border-[1px] border-airbnb-dark rounded-lg text-airbnb-darkest">Cancelled</a>
         </div>
