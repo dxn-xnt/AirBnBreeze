@@ -126,7 +126,7 @@
                 <button type="button"
                         id="confirmCancelBtn"
                         class="px-4 py-2 bg-airbnb-dark text-white rounded hover:bg-airbnb-darkest hover:shadow-md">
-                    Confirm Cancel
+                    Confirm
                 </button>
             </div>
         </div>
