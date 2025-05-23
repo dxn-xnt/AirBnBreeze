@@ -77,7 +77,7 @@ class BookingController extends Controller
         ]);
 
         // Save to database
-        Booking::create([
+        $booking = Booking::create([
             'book_check_in' => $request->input('start_date'),
             'book_check_out' => $request->input('end_date'),
             'book_total_price' => $request->input('total_cost'),
@@ -85,11 +85,9 @@ class BookingController extends Controller
             'book_adult_count' => $request->input('book_adult_count'),
             'book_child_count' => $request->input('book_child_count'),
             'prop_id' => $property_id,
-            'user_guest_id' => Auth::id(), // assumes user is logged in
-            'book_status' => 'pending', // All new bookings start as pending
+            'user_guest_id' => Auth::id(),
+            'book_status' => 'pending',
         ]);
-
-
 
         // Optional: Notification for guest
         Notification::create([
@@ -116,7 +114,7 @@ class BookingController extends Controller
     public function show($id)
     {
         $booking = Booking::with(['property' => function ($query) {
-            $query->with('images'); // Eager load images relationship
+            $query->with('images');
         }])->findOrFail($id);
 
         // Ensure the user can only view their own bookings

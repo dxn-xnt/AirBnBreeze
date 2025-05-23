@@ -130,6 +130,38 @@ class HostController extends Controller
         }
     }
 
+    public function declineBooking(Booking $booking)
+    {
+        if ($booking->property->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized action'
+            ], 403);
+        }
+
+        if ($booking->book_status === 'declined') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking is already cancelled'
+            ], 400);
+        }
+
+        try {
+            $booking->update(['book_status' => 'declined']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking has been declined.',
+                'bookingId' => $booking->book_id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error cancelling booking: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to decline booking'
+            ], 500);
+        }
+    }
+
     public function viewAcceptedBookings()
     {
         $userId = auth()->id();

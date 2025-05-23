@@ -21,7 +21,7 @@
         <!-- Booking Requests -->
         <div class="space-y-6">
             @forelse($bookings as $booking)
-                <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="bg-transparent border border-black rounded-lg p-5 shadow">
                     <div class="flex flex-col md:flex-row justify-between">
                         <!-- Booking Details -->
                         <div class="flex-1">

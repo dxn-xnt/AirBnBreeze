@@ -20,19 +20,22 @@
 
             <!-- Gallery Images (Right Column) -->
             <div class="flex-1 grid grid-cols-2 gap-3 sm:gap-4">
+                @php $maxGalleryPreviews = 5; @endphp
+
                 @foreach($data['images']['gallery'] as $key => $image)
-                    @if($key > 0) <!-- Skip the first image (index 0) -->
+                    @if($key > 0 && $loop->iteration <= $maxGalleryPreviews)
                         <div class="relative">
                             <img src="{{ asset('storage/' . $image) }}"
-                                alt="Gallery view {{ $key + 1 }}"
-                                class="w-full h-[140px] sm:h-[160px] md:h-[190px] object-cover rounded-xl sm:rounded-2xl border border-airbnb-darkest shadow-md">
-                            @if($key === count($data['images']['gallery']) - 1)
+                                 alt="Gallery view {{ $key + 1 }}"
+                                 class="w-full h-[140px] sm:h-[160px] md:h-[190px] object-cover rounded-xl sm:rounded-2xl border border-airbnb-darkest shadow-md">
+
+                            @if($loop->iteration === $maxGalleryPreviews || $key === count($data['images']['gallery']) - 1)
                                 <span id="showAllPhotosButton"
-                                    onclick="openPhotoModal()"
-                                    class="absolute bottom-2 sm:bottom-[10px] right-2 sm:right-[10px] bg-airbnb-light text-airbnb-darkest py-1 px-2 sm:px-2.5 rounded-xl sm:rounded-2xl text-xs font-semibold cursor-pointer">
-                                    Show All Photos
-                                </span>
-                           @endif
+                                      onclick="openPhotoModal()"
+                                      class="absolute bottom-2 sm:bottom-[10px] right-2 sm:right-[10px] bg-airbnb-light text-airbnb-darkest py-1 px-2 sm:px-2.5 rounded-xl sm:rounded-2xl text-xs font-semibold cursor-pointer">
+                        Show All Photos
+                    </span>
+                            @endif
                         </div>
                     @endif
                 @endforeach

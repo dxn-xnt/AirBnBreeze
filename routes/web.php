@@ -103,6 +103,7 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
         // Accept Booking
         Route::patch('/{booking}/approve', [HostController::class, 'acceptBooking'])->name('host.bookings.approve');
         Route::patch('/{booking}/cancel', [HostController::class, 'cancelBooking'])->name('host.bookings.cancel');
+        Route::patch('/{booking}/decline', [HostController::class, 'declineBooking'])->name('host.bookings.decline');
 
     });
 
