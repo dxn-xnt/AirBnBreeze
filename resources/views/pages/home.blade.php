@@ -16,7 +16,6 @@
             <x-search-bar />
         </section>
 
-        <!-- Filters Section -->
         <section class="relative mb-8 md:mb-10 z-[5] w-full">
             <div class="flex justify-center custom-green-gradient py-20 sm:py-24 md:pt-[6.5rem] md:pb-[1.3rem] shadow-md mt-[-60px] sm:mt-[-75px] md:mt-[-90px] w-full relative z-10">
                 <div class="flex gap-3 sm:gap-5 md:gap-5 justify-start sm:justify-center max-w-[1750px] mx-auto w-full px-4 sm:px-6 md:px-8 overflow-x-auto scrollbar-hide">
@@ -31,6 +30,8 @@
                 </div>
             </div>
         </section>
+
+
 
         <!-- Listings Section - Optimized 3-column max -->
         <section class="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
@@ -84,7 +85,6 @@
     </div>
 </footer>
 @endsection
-
 
 @push('styles')
 <style>

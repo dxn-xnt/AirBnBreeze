@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\User;
+use App\Models\Notification;
 use App\Models\Property;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,7 +62,6 @@ class UserController extends Controller
         return redirect()->route('login')->with('success', 'User created successfully!');
     }
 
-
     public function deleteUser($id){
         $user = User::find($id);
         if(!$user){
@@ -75,7 +74,6 @@ class UserController extends Controller
     public function viewProfile()
     {
         $user = auth()->user();
-
         $properties = Property::where('user_id', $user->user_id)->get();
 
         return view('pages.profile-view', [
