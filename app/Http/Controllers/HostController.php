@@ -159,7 +159,7 @@ class HostController extends Controller
             ->whereHas('property', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->whereIn('book_status', ['upcoming', 'ongoing'])
+            ->where('book_status', 'accepted')
             ->orderBy('book_date_created', 'desc')
             ->get();
 
