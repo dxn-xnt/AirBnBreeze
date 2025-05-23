@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -9,67 +10,16 @@ class NotificationController extends Controller
     public function index()
     {
         // Current notifications (unread or recent)
-        $notifications = [
-            [
-                'id' => 1,
-                'type' => 'new_booking',
-                'title' => "Limosnero's Private House",
-                'sender' => 'Donesia Pacquio',
-                'message' => 'New booking request',
-                'time' => '9:41 AM',
-                'read' => false,
-                'image' => 'assets/images/MD.png',
-                'is_older' => false
-            ],
-            [
-                'id' => 2,
-                'type' => 'cancellation',
-                'title' => "Cancelled Booking for Limosnero's Private House",
-                'sender' => 'Donesia Pacquio',
-                'message' => 'Booking was cancelled',
-                'time' => 'Yesterday',
-                'read' => false,
-                'image' => 'assets/images/MD.png',
-                'is_older' => false
-            ],
-            [
-                'id' => 3,
-                'type' => 'completed',
-                'title' => "Completed Booking for Limosnero's Private House",
-                'sender' => 'Donesia Pacquio',
-                'message' => 'Booking completed successfully',
-                'time' => '2 days ago',
-                'read' => true,
-                'image' => 'assets/images/MD.png',
-                'is_older' => false
-            ],
-        ];
+        $notifications = Notification::with(['sender', 'property'])
+            ->where('notif_receiver_id', auth()->id())
+            ->where('notif_is_read', false)
+            ->get();
 
         // Older notifications (read and older than a week)
-        $olderNotifications = [
-            [
-                'id' => 4,
-                'type' => 'payment',
-                'title' => "New Review for Limosnero's Private House",
-                'sender' => 'Donesia Pacquio',
-                'message' => 'Payment processed successfully',
-                'time' => '1 week ago',
-                'read' => true,
-                'image' => 'assets/images/MD.png',
-                'is_older' => true
-            ],
-            [
-                'id' => 5,
-                'type' => 'review',
-                'title' => "New Review for Limosnero's Private House",
-                'sender' => 'Donesia Pacquio',
-                'message' => 'Left a 5-star review',
-                'time' => '2 weeks ago',
-                'read' => true,
-                'image' => 'assets/images/MD.png',
-                'is_older' => true
-            ],
-        ];
+        $olderNotifications = Notification::with(['sender', 'property'])
+            ->where('notif_receiver_id', auth()->id())
+            ->where('notif_is_read', true)
+            ->get();
 
         return view('pages.notifications', [
             'notifications' => $notifications,
@@ -85,13 +35,28 @@ class NotificationController extends Controller
 
     public function markAllAsRead()
     {
-        // In a real app, mark all notifications as read
-        return redirect()->back();
+        $userId = auth()->id();
+        $updatedCount = Notification::where('notif_receiver_id', $userId)
+            ->where('notif_is_read', false)
+            ->update(['notif_is_read' => true]);
+
+        return redirect()->route('notifications.index');
     }
 
     public function delete($id)
     {
-        // In a real app, delete the notification
-        return redirect()->back();
+        try {
+            $notification = Notification::where('notif_receiver_id', auth()->id())
+                ->findOrFail($id);
+
+            $notification->delete();
+
+            return redirect()->route('notifications.index');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete notification'
+            ], 404);
+        }
     }
 }

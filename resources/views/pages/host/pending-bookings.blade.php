@@ -190,7 +190,7 @@
                 });
             });
 
-            // Decline Booking
+            // Decline Booking - Fixed URL
             document.querySelectorAll('.decline-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const bookingId = this.dataset.bookingId;
