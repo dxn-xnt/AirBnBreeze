@@ -119,7 +119,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Contact Details Modal (unchanged)
+            // Contact Details Modal
             const contactBtns = document.querySelectorAll('.contact-details-btn');
             const contactModal = document.getElementById('contactModal');
             const contactEmail = document.getElementById('contact-email');
@@ -138,7 +138,17 @@
                 contactModal.classList.add('hidden');
             });
 
-            // Booking Actions - Fixed version
+            // Get CSRF token from meta tag or create it
+            function getCSRFToken() {
+                let token = document.querySelector('meta[name="csrf-token"]');
+                if (token) {
+                    return token.getAttribute('content');
+                }
+                // Fallback: try to get from Laravel's global object
+                return window.Laravel && window.Laravel.csrfToken ? window.Laravel.csrfToken : '{{ csrf_token() }}';
+            }
+
+            // Approve Booking - FIXED URL
             document.querySelectorAll('.approve-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const bookingId = this.dataset.bookingId;
@@ -148,25 +158,25 @@
                     }
 
                     if (confirm('Are you sure you want to approve this booking?')) {
-                        fetch(`/host/bookings/pending/${bookingId}`, {  // Notice the correct URL construction
+                        fetch(`/host/bookings/${bookingId}/approve`, {
                             method: 'PATCH',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-CSRF-TOKEN': getCSRFToken(),
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                // You can add any additional data here if needed
-                            })
+                            }
                         })
                             .then(response => {
+                                console.log('Response status:', response.status);
                                 if (!response.ok) {
-                                    throw new Error('Network response was not ok');
+                                    throw new Error(`HTTP error! status: ${response.status}`);
                                 }
                                 return response.json();
                             })
                             .then(data => {
+                                console.log('Response data:', data);
                                 if (data.success) {
+                                    alert('Booking approved successfully!');
                                     location.reload();
                                 } else {
                                     alert(data.message || 'Failed to approve booking');
@@ -174,27 +184,41 @@
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while approving the booking');
+                                alert('An error occurred while approving the booking. Check console for details.');
                             });
                     }
                 });
             });
 
+            // Decline Booking
             document.querySelectorAll('.decline-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const bookingId = this.dataset.bookingId;
+                    if (!bookingId) {
+                        console.error('No booking ID found');
+                        return;
+                    }
+
                     if (confirm('Are you sure you want to decline this booking?')) {
-                        fetch(`/host/bookings/pending/${bookingId}`, {
+                        fetch(`/host/bookings/${bookingId}/decline`, {
                             method: 'PATCH',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-CSRF-TOKEN': getCSRFToken(),
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json'
                             }
                         })
-                            .then(response => response.json())
+                            .then(response => {
+                                console.log('Response status:', response.status);
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
                             .then(data => {
+                                console.log('Response data:', data);
                                 if (data.success) {
+                                    alert('Booking declined successfully!');
                                     location.reload();
                                 } else {
                                     alert(data.message || 'Failed to decline booking');
@@ -202,7 +226,7 @@
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while declining the booking');
+                                alert('An error occurred while declining the booking. Check console for details.');
                             });
                     }
                 });

@@ -70,7 +70,7 @@
 
                             <div class="flex space-x-2">
                                 <button class="text-airbnb-light bg-airbnb-dark hover:bg-airbnb-darkest hover:shadow-md py-[1px] px-4 rounded-full cancel-booking-btn"
-                                        data-booking-id="{{ $booking->id }}">
+                                        data-booking-id="{{ $booking->book_id }}">
                                     Cancel Booking
                                 </button>
                             </div>
@@ -104,8 +104,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Contact Details Modal
+        document.addEventListener('DOMContentLoaded', function () {
+            // Contact Details Modal (already works)
             const contactBtns = document.querySelectorAll('.contact-details-btn');
             const contactModal = document.getElementById('contactModal');
             const contactEmail = document.getElementById('contact-email');
@@ -113,36 +113,69 @@
             const closeModal = document.getElementById('closeModal');
 
             contactBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     contactEmail.textContent = this.dataset.email;
                     contactPhone.textContent = this.dataset.phone || 'Not provided';
                     contactModal.classList.remove('hidden');
                 });
             });
 
-            closeModal.addEventListener('click', function() {
+            closeModal.addEventListener('click', function () {
                 contactModal.classList.add('hidden');
             });
 
-            // Cancel Booking Action
+            // Cancel Booking Logic
             document.querySelectorAll('.cancel-booking-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', async function () {
                     const bookingId = this.dataset.bookingId;
-                    if (confirm('Are you sure you want to cancel this booking?')) {
-                        fetch(`/host/bookings/${bookingId}/cancel`, {
+
+                    if (!bookingId || isNaN(bookingId)) {
+                        alert('Invalid booking ID');
+                        console.error('Invalid booking ID:', bookingId);
+                        return;
+                    }
+
+                    if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing';
+
+                    try {
+                        const response = await fetch(`/host/bookings/${bookingId}/cancel`, {
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
+                                'Accept': 'application/json'
                             }
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    location.reload();
-                                }
-                            });
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Failed to cancel booking');
+                        }
+
+                        const data = await response.json();
+
+                        alert(data.message);
+
+                        // ✅ REMOVE THE BOOKING CARD FROM THE DOM
+                        const card = this.closest('.bg-transparent.border');
+                        if (card) {
+                            card.remove();
+                        }
+
+                        // Optional: Redirect
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                        }
+
+                    } catch (error) {
+                        console.error('Error cancelling booking:', error);
+                        alert(error.message);
+                        this.disabled = false;
+                        this.innerHTML = originalText;
                     }
                 });
             });

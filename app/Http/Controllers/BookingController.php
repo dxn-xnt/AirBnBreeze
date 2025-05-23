@@ -26,7 +26,7 @@ class BookingController extends Controller
         }
 
         // Validate that the category is valid
-        if (!in_array($category, ['upcoming', 'pending', 'recent', 'cancelled'])) {
+        if (!in_array($category, ['upcoming', 'pending', 'recent', 'cancelled', 'ongoing'])) {
             $category = 'upcoming';
         }
 
@@ -43,6 +43,9 @@ class BookingController extends Controller
             })
             ->when($category === 'cancelled', function ($query) {
                 $query->where('book_status', 'cancelled');
+            })
+            ->when($category === 'ongoing', function ($query) {
+                $query->where('book_status', 'ongoing');
             })
             ->with(['property' => function ($query) {
                 $query->with('images'); // Eager load images relationship
