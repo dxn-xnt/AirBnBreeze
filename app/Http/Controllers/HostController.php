@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Notification;
 use App\Models\Property;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class HostController extends Controller
 {
@@ -44,7 +41,7 @@ class HostController extends Controller
     }
     public function acceptBooking(Booking $booking)
     {
-        // Verify authorization and booking status in one check
+        // Verify the booking belongs to the authenticated host
         if ($booking->property->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
@@ -101,7 +98,6 @@ class HostController extends Controller
 
     public function cancelBooking(Booking $booking)
     {
-        // Authorization: Verify the booking belongs to the authenticated host
         if ($booking->property->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
@@ -109,7 +105,6 @@ class HostController extends Controller
             ], 403);
         }
 
-        // Validate status: Ensure the booking can be cancelled
         if (!in_array($booking->book_status, ['pending', 'upcoming', 'ongoing'])) {
             return response()->json([
                 'success' => false,
@@ -118,26 +113,11 @@ class HostController extends Controller
         }
 
         try {
-            // Cancel the booking by updating its status
             $booking->update(['book_status' => 'cancelled']);
-
-            // Optional: Send notification to guest (uncomment if you have notifications set up)
-            // $booking->user->notify(new BookingCancelled($booking));
-
-            //Add notification
-            Notification::create([
-                'notif_type' => 'decline_booking',
-                'notif_message' => 'Declined Booking For ' . $booking->property->title,
-                'notif_is_read' => false,
-                'notif_sender_id' => auth()->id(),
-                'notif_receiver_id' => $booking->user->user_id,
-                'prop_id' => $booking->property->property_id,
-            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Booking has been cancelled successfully',
-                'redirect' => route('host.bookings.index')
+                'message' => 'Booking has been cancelled successfully'
             ]);
 
         } catch (\Exception $e) {
@@ -159,7 +139,7 @@ class HostController extends Controller
             ->whereHas('property', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->where('book_status', 'accepted')
+            ->whereIn('book_status', ['upcoming', 'ongoing'])
             ->orderBy('book_date_created', 'desc')
             ->get();
 

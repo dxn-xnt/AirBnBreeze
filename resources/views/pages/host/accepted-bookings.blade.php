@@ -105,7 +105,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Contact Details Modal (already works)
+            // Contact Details Modal
             const contactBtns = document.querySelectorAll('.contact-details-btn');
             const contactModal = document.getElementById('contactModal');
             const contactEmail = document.getElementById('contact-email');
@@ -123,6 +123,11 @@
             closeModal.addEventListener('click', function () {
                 contactModal.classList.add('hidden');
             });
+
+            // Helper: Get CSRF Token
+            function getCSRFToken() {
+                return document.querySelector('meta[name="csrf-token"]')?.content;
+            }
 
             // Cancel Booking Logic
             document.querySelectorAll('.cancel-booking-btn').forEach(btn => {
@@ -146,7 +151,7 @@
                         const response = await fetch(`/host/bookings/${bookingId}/cancel`, {
                             method: 'PATCH',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-CSRF-TOKEN': getCSRFToken(),
                                 'Accept': 'application/json'
                             }
                         });
@@ -160,7 +165,7 @@
 
                         alert(data.message);
 
-                        // ✅ REMOVE THE BOOKING CARD FROM THE DOM
+                        // Remove the booking card from the DOM
                         const card = this.closest('.bg-transparent.border');
                         if (card) {
                             card.remove();
@@ -173,10 +178,12 @@
 
                     } catch (error) {
                         console.error('Error cancelling booking:', error);
-                        alert(error.message);
-                        this.disabled = false;
-                        this.innerHTML = originalText;
+                        alert(error.message || 'An unknown error occurred.');
                     }
+
+                    // Reset button text
+                    this.disabled = false;
+                    this.innerHTML = originalText;
                 });
             });
         });
