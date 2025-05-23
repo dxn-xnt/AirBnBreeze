@@ -148,7 +148,7 @@
                     }
 
                     if (confirm('Are you sure you want to approve this booking?')) {
-                        fetch(`/host/bookings/${bookingId}`, {  // Notice the correct URL construction
+                        fetch(`/host/bookings/pending/${bookingId}`, {  // Notice the correct URL construction
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -184,7 +184,7 @@
                 btn.addEventListener('click', function() {
                     const bookingId = this.dataset.bookingId;
                     if (confirm('Are you sure you want to decline this booking?')) {
-                        fetch(`/host/bookings/${bookingId}/decline`, {
+                        fetch(`/host/bookings/pending/${bookingId}`, {
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

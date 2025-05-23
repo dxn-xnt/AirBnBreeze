@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Property;
 use App\Models\Booking;
 use Illuminate\Http\Request;
@@ -83,6 +84,18 @@ class BookingController extends Controller
             'prop_id' => $property_id,
             'user_guest_id' => Auth::id(), // assumes user is logged in
             'book_status' => 'pending', // All new bookings start as pending
+        ]);
+
+
+
+        // Optional: Notification for guest
+        Notification::create([
+            'notif_type' => 'booking_confirmation',
+            'notif_message' => 'Your booking request has been submitted',
+            'notif_is_read' => false,
+            'notif_sender_id' => $booking->property->user_id, // property owner
+            'notif_receiver_id' => Auth::id(), // guest
+            'prop_id' => $property_id,
         ]);
 
         return redirect()->route('bookings.category', ['category' => 'pending'])

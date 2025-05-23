@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Property;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class HostController extends Controller
 {
@@ -39,50 +42,58 @@ class HostController extends Controller
     }
     public function acceptBooking(Booking $booking)
     {
-        // Verify the booking belongs to the authenticated host
+        // Verify authorization and booking status in one check
         if ($booking->property->user_id !== auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized action'
-            ], 403);
+            Log::warning('Unauthorized booking acceptance attempt', [
+                'booking_id' => $booking->id,
+                'user_id' => auth()->id()
+            ]);
+            return response()->json(['message' => 'Unauthorized action'], 403);
         }
 
-        // Check if booking is already accepted
-        if ($booking->book_status === 'accepted') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking is already accepted'
-            ], 400);
-        }
-
-        // Check if booking is pending
         if ($booking->book_status !== 'pending') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Only pending bookings can be accepted'
-            ], 400);
+            $message = $booking->book_status === 'accepted'
+                ? 'Booking is already accepted'
+                : 'Only pending bookings can be accepted';
+
+            Log::info('Invalid booking status change attempt', [
+                'booking_id' => $booking->id,
+                'current_status' => $booking->book_status
+            ]);
+
+            return response()->json(['message' => $message], 400);
         }
 
         try {
-            // Update booking status
-            $booking->update([
-                'book_status' => 'accepted',
-                'approved_at' => now()
-            ]);
+            DB::transaction(function () use ($booking) {
+                $booking->update([
+                    'book_status' => 'accepted',
+                    'approved_at' => now()
+                ]);
 
-            // Send notification to guest
-            $booking->user->notify(new BookingAccepted($booking));
+                Notification::create([
+                    'notif_type' => 'accept_booking',
+                    'notif_message' => 'Accepted Booking For ' . $booking->property->title,
+                    'notif_is_read' => false,
+                    'notif_sender_id' => auth()->id(),
+                    'notif_receiver_id' => $booking->user_id, // Changed from user->user_id
+                    'prop_id' => $booking->property_id,      // Changed from property->property_id
+                ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking has been approved successfully'
-            ]);
+                Log::info('Booking accepted successfully', [
+                    'booking_id' => $booking->id,
+                    'approved_by' => auth()->id()
+                ]);
+            });
+
+            return response()->json(['message' => 'Booking approved successfully']);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to approve booking: ' . $e->getMessage()
-            ], 500);
+            Log::error('Booking acceptance failed', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Failed to approve booking'], 500);
         }
     }
 
@@ -109,6 +120,16 @@ class HostController extends Controller
             $booking->update([
                 'book_status' => 'declined',
                 'declined_at' => now()
+            ]);
+
+            //Add notification
+            Notification::create([
+                'notif_type' => 'decline_booking',
+                'notif_message' => 'Declined Booking For ' . $booking->property->title,
+                'notif_is_read' => false,
+                'notif_sender_id' => auth()->id(),
+                'notif_receiver_id' => $booking->user->user_id,
+                'prop_id' => $booking->property->property_id,
             ]);
 
             return response()->json([

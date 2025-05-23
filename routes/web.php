@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'delete'])->name('notifications.delete');
     });
 });
-
+//Creating Property
 Route::prefix('property/create')->middleware(['auth'])->group(function () {
     Route::get('/starter', [PropertyCreationController::class, 'createProperty_starter'])->name('property.create.starter');
     Route::get('/identify-house', [PropertyCreationController::class, 'createProperty_step1'])->name('property.create');
@@ -105,6 +105,7 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
         Route::patch('/{booking}/decline', [HostController::class, 'cancelBooking'])->name('host.bookings.decline');
     });
 
+    //Host Management
     Route::prefix('property/{property}')->group(function () {
         Route::prefix('view-edit')->group(function () {
             Route::get('/type', [PropertyEditController::class, 'viewEditType'])->name('property.edit.type');
@@ -129,23 +130,6 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
         });
     });
 });
-Route::get('/profile-view', [UserController::class, 'viewProfile'])->middleware(['auth'])->name('profile.view');
-
-// Favorites page
-Route::get('/favorites', function () {
-    return view('pages.Favorites');
-})->middleware(['auth'])->name('favorites');
-
-// About Us page
-Route::get('/about', function () {
-    return view('pages.AboutUs');
-})->name('about');
-
-// Help Center page
-Route::get('/help', function () {
-    return view('pages.HelpCenter');
-})->name('help');
-
 // Fallback Route
 Route::fallback(function () {
     return view('pages.404');

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Notification;
 use App\Models\Property;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -71,7 +72,6 @@ class UserController extends Controller
     public function viewProfile()
     {
         $user = auth()->user();
-
         $properties = Property::where('user_id', $user->user_id)->get();
 
         return view('pages.profile-view', [
@@ -80,13 +80,5 @@ class UserController extends Controller
         ]);
     }
 
-}
 
-function validateData($data, $method)
-{
-    $message = "Succesfully {$method} user";
-    if ($data) {
-        return response()->json(["message" => $message ?: "Successfully fetched data", "data" => $data], 200);
-    }
-    return response()->json(["message" => "Resource not found"], 404);
 }
