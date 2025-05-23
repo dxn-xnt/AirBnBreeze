@@ -98,7 +98,6 @@ class HostController extends Controller
 
     public function cancelBooking(Booking $booking)
     {
-        // Authorization: Verify the booking belongs to the authenticated host
         if ($booking->property->user_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
@@ -106,7 +105,6 @@ class HostController extends Controller
             ], 403);
         }
 
-        // Validate status: Ensure the booking can be cancelled
         if (!in_array($booking->book_status, ['pending', 'upcoming', 'ongoing'])) {
             return response()->json([
                 'success' => false,
@@ -115,16 +113,11 @@ class HostController extends Controller
         }
 
         try {
-            // Cancel the booking by updating its status
             $booking->update(['book_status' => 'cancelled']);
-
-            // Optional: Send notification to guest (uncomment if you have notifications set up)
-            // $booking->user->notify(new BookingCancelled($booking));
 
             return response()->json([
                 'success' => true,
-                'message' => 'Booking has been cancelled successfully',
-                'redirect' => route('host.bookings.index')
+                'message' => 'Booking has been cancelled successfully'
             ]);
 
         } catch (\Exception $e) {
