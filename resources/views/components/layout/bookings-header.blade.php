@@ -1,3 +1,3 @@
 <div>
-    <!-- Smile, breathe, and go slowly. - Thich Nhat Hanh -->
+    <!-- Simplicity is the ultimate sophistication. - Leonardo da Vinci -->
 </div>
