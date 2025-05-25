@@ -220,46 +220,6 @@
                     }
                 });
             });
-            // Decline Booking
-            // document.querySelectorAll('.decline-btn').forEach(btn => {
-            //     btn.addEventListener('click', function () {
-            //         const bookingId = this.dataset.bookingId;
-            //         if (!bookingId) {
-            //             console.error('No booking ID found');
-            //             return;
-            //         }
-            //         if (confirm('Are you sure you want to decline this booking?')) {
-            //             fetch(`/host/bookings/${bookingId}/decline`, {
-            //                 method: 'PATCH',
-            //                 headers: {
-            //                     'X-CSRF-TOKEN': getCSRFToken(),
-            //                     'Accept': 'application/json',
-            //                     'Content-Type': 'application/json'
-            //                 }
-            //             })
-            //                 .then(response => {
-            //                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            //                     return response.json();
-            //                 })
-            //                 .then(data => {
-            //                     if (data.success) {
-            //                         // Remove the booking from the DOM
-            //                         const bookingElement = document.getElementById(`booking-${bookingId}`);
-            //                         if (bookingElement) {
-            //                             bookingElement.remove();
-            //                         }
-            //                         alert('Booking declined successfully!');
-            //                     } else {
-            //                         alert(data.message || 'Failed to decline booking');
-            //                     }
-            //                 })
-            //                 .catch(error => {
-            //                     console.error('Error:', error);
-            //                     alert('An error occurred while declining the booking. Check console for details.');
-            //                 });
-            //         }
-            //     });
-            // });
         });
     </script>
 @endsection
