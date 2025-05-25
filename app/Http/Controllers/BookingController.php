@@ -60,26 +60,23 @@ class BookingController extends Controller
     {
         $property = Property::with(['host', 'images', 'amenities'])->findOrFail($property_id);
 
-        return view('pages.request-booking', compact('property'));
+        // Get all accepted bookings for this property
+        $unavailableDates = Booking::where('prop_id', $property_id)
+            ->whereIn('book_status', ['accepted', 'upcoming'])
+            ->get()
+            ->map(function ($booking) {
+                return [
+                    'start' => $booking->book_check_in,
+                    'end' => $booking->book_check_out,
+                ];
+            });
+
+        return view('pages.request-booking', compact('property', 'unavailableDates'));
     }
 
     // Process the final booking request
     public function processBooking(Request $request, $property_id)
     {
-        // Get the authenticated user's ID
-        $userId = Auth::id();
-
-        // Check if the user has already booked this property
-        $existingBooking = Booking::where('user_guest_id', $userId)
-            ->where('prop_id', $property_id)
-            ->whereIn('book_status', ['pending', 'accepted']) // or whatever statuses you want to restrict
-            ->exists();
-
-        if ($existingBooking) {
-            return redirect()->back()
-                ->with('error', 'You have already requested to book this property.');
-        }
-
         // Validate request
         $request->validate([
             'start_date' => 'required|date',
@@ -90,16 +87,33 @@ class BookingController extends Controller
             'book_child_count' => 'required|integer|min:0',
         ]);
 
+        // Get dates from request
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Check for overlapping bookings
+        $overlappingBooking = Booking::where('prop_id', $property_id)
+            ->whereIn('book_status', ['accepted', 'upcoming'])
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('book_check_in', [$startDate, $endDate])
+                    ->orWhereBetween('book_check_out', [$startDate, $endDate]);
+            })->exists();
+
+        if ($overlappingBooking) {
+            return back()->withErrors(['dates' => 'The selected dates are already booked.'])
+                ->withInput();
+        }
+
         // Save to database
         $booking = Booking::create([
-            'book_check_in' => $request->input('start_date'),
-            'book_check_out' => $request->input('end_date'),
+            'book_check_in' => $startDate,
+            'book_check_out' => $endDate,
             'book_total_price' => $request->input('total_cost'),
             'book_notes' => $request->input('notes'),
             'book_adult_count' => $request->input('book_adult_count'),
             'book_child_count' => $request->input('book_child_count'),
             'prop_id' => $property_id,
-            'user_guest_id' => $userId,
+            'user_guest_id' => Auth::id(),
             'book_status' => 'pending',
         ]);
 
@@ -108,7 +122,7 @@ class BookingController extends Controller
             'notif_message' => 'Your booking request has been submitted',
             'notif_is_read' => false,
             'notif_sender_id' => $booking->property->user_id, // property owner
-            'notif_receiver_id' => $userId,
+            'notif_receiver_id' => Auth::id(),
             'book_id' => $booking->book_id,
             'prop_id' => $property_id,
         ]);

@@ -164,10 +164,6 @@
                             <div class="text-[0.875rem] sm:text-[1rem] text-[#375534]" id="nightlyCost">₱{{ number_format($property->prop_price_per_night, 2) }} x 10</div>
                             <div class="text-[0.875rem] sm:text-[1rem] text-[#375534]" id="totalCost">₱{{ number_format($property->prop_price_per_night * 10, 2) }}</div>
                         </div>
-                        <div class="flex justify-between text-[0.75rem] sm:text-[0.875rem]">
-                            <div class="text-[#375534] opacity-80">First booking discount (10%)</div>
-                            <div class="text-[#375534]" id="discountAmount">₱{{ number_format($property->prop_price_per_night * 10 * 0.1, 2) }}</div>
-                        </div>
                         <div class="flex justify-between mt-[0.5rem] border-t pt-[0.5rem] font-semibold">
                             <div class="text-[#375534] text-[0.75rem] sm:text-[0.875rem]">Total:</div>
                             <div class="text-[#375534] text-[0.75rem] sm:text-[0.875rem]" id="finalTotal">₱{{ number_format(($property->prop_price_per_night * 10) - ($property->prop_price_per_night * 10 * 0.1), 2) }}</div>
@@ -219,7 +215,9 @@
             </div>
         </div>
     </div>
-
+    <script>
+        const UNAVAILABLE_DATES = @json($unavailableDates);
+    </script>
     <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -345,7 +343,6 @@
             const nightlyRate = parseFloat("{{ $property->prop_price_per_night }}");
             const nightlyCostDisplay = document.getElementById('nightlyCost');
             const totalCostDisplay = document.getElementById('totalCost');
-            const discountDisplay = document.getElementById('discountAmount');
             const finalTotalDisplay = document.getElementById('finalTotal');
             const startInput = document.getElementById('start_date_input');
             const endInput = document.getElementById('end_date_input');
@@ -380,28 +377,80 @@
                 if (!start || !end) return;
                 const nights = calculateNights(start, end);
                 const total = nightlyRate * nights;
-                const discount = total * 0.1;
-                const final = total - discount;
+                const final = total;
                 nightlyCostDisplay.textContent = `₱${nightlyRate.toFixed(2)} x ${nights}`;
                 totalCostDisplay.textContent = `₱${total.toFixed(2)}`;
-                discountDisplay.textContent = `₱${discount.toFixed(2)}`;
                 finalTotalDisplay.textContent = `₱${final.toFixed(2)}`;
                 startInput.value = start;
                 endInput.value = end;
                 totalCostInput.value = final.toFixed(2);
             }
 
-            // Date input event listeners
+            function isDateUnavailable(dateStr) {
+                const selectedDate = new Date(dateStr);
+                selectedDate.setHours(0, 0, 0, 0);
+
+                return UNAVAILABLE_DATES.some(range => {
+                    const start = new Date(range.start);
+                    const end = new Date(range.end);
+                    start.setHours(0, 0, 0, 0);
+                    end.setHours(0, 0, 0, 0);
+
+                    return selectedDate >= start && selectedDate <= end;
+                });
+            }
+
+            function validateSelectedDates() {
+                const start = startDateInput.value;
+                const end = endDateInput.value;
+
+                if (isDateUnavailable(start)) {
+                    alert("The check-in date is unavailable.");
+                    startDateInput.focus();
+                    return false;
+                }
+
+                if (isDateUnavailable(end)) {
+                    alert("The check-out date is unavailable.");
+                    endDateInput.focus();
+                    return false;
+                }
+
+                return true;
+            }
+
+// Add event listener to the form submit
+            document.querySelector('form').addEventListener('submit', function (e) {
+                if (!validateSelectedDates()) {
+                    e.preventDefault(); // Prevent submission
+                }
+            });
+
+// Disable past and unavailable dates
+            startDateInput.setAttribute('min', '{{ now()->format('Y-m-d') }}');
+            endDateInput.setAttribute('min', '{{ now()->format('Y-m-d') }}');
+
             startDateInput.addEventListener('change', function () {
-                if (new Date(this.value) > new Date(endDateInput.value)) {
+                if (isDateUnavailable(this.value)) {
+                    alert("Selected check-in date is unavailable.");
+                    this.value = '';
+                    return;
+                }
+                if (this.value && endDateInput.value && this.value > endDateInput.value) {
                     endDateInput.value = this.value;
                 }
                 endDateInput.min = this.value;
                 updateDateRangeDisplay();
                 updateCosts();
             });
+
             endDateInput.addEventListener('change', function () {
-                if (new Date(this.value) < new Date(startDateInput.value)) {
+                if (isDateUnavailable(this.value)) {
+                    alert("Selected check-out date is unavailable.");
+                    this.value = '';
+                    return;
+                }
+                if (this.value && startDateInput.value && this.value < startDateInput.value) {
                     this.value = startDateInput.value;
                 }
                 updateDateRangeDisplay();
@@ -448,6 +497,27 @@
                     bookChildInput.value = children;
                 });
             }
+
+            function showUnavailableMessage(isUnavailable) {
+                const messageDiv = document.getElementById('availabilityMessage');
+                if (isUnavailable) {
+                    messageDiv.textContent = 'The selected dates are already booked.';
+                    messageDiv.classList.add('text-red-500');
+                } else {
+                    messageDiv.textContent = '';
+                    messageDiv.classList.remove('text-red-500');
+                }
+            }
+
+            startDatePicker.onChange = function(selectedDates, dateStr, instance) {
+                const isUnavailable = isDateUnavailable(dateStr);
+                showUnavailableMessage(isUnavailable);
+            };
+
+            endDatePicker.onChange = function(selectedDates, dateStr, instance) {
+                const isUnavailable = isDateUnavailable(dateStr);
+                showUnavailableMessage(isUnavailable);
+            };
         });
     </script>
 
