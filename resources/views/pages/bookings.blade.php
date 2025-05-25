@@ -81,19 +81,29 @@
                                         Edit
                                     </button>
 
-                                    <!-- Cancel Button (Replaced with Modal Trigger) -->
-                                    <button type="button"
-                                            class="bg-airbnb-dark text-airbnb-light py-1.5 px-4 rounded-full text-sm w-full hover:bg-opacity-90 cancel-user-booking-btn"
-                                            data-booking-id="{{ $booking->book_id }}"
-                                            data-upcoming="{{ $booking->book_status == 'upcoming' ? '1' : '0' }}">
-                                        Cancel Booking
-                                    </button>
-
-                                    <!-- Hidden Form -->
-                                    <form id="userCancelForm-{{ $booking->book_id }}" action="{{ route('bookings.cancel', $booking->book_id) }}" method="POST" class="hidden">
-                                        @csrf
-                                        <input type="hidden" name="reason" id="userCancelReasonInput-{{ $booking->book_id }}">
-                                    </form>
+                                    @if($booking->book_status === 'pending')
+                                        <!-- Direct Cancel Button (No Modal) -->
+                                        <form action="{{ route('bookings.cancel', $booking->book_id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="bg-airbnb-dark text-airbnb-light py-1.5 px-4 rounded-full text-sm w-full hover:bg-red-700 transition duration-200">
+                                                Cancel Booking
+                                            </button>
+                                        </form>
+                                    @else
+                                        <!-- Show Modal Trigger if not pending -->
+                                        <button type="button"
+                                                class="bg-airbnb-dark text-airbnb-light py-1.5 px-4 rounded-full text-sm w-full hover:bg-opacity-90 cancel-user-booking-btn"
+                                                data-booking-id="{{ $booking->book_id }}"
+                                                data-upcoming="{{ $booking->book_status == 'upcoming' ? '1' : '0' }}">
+                                            Cancel Booking
+                                        </button>
+                                        <!-- Hidden Form -->
+                                        <form id="userCancelForm-{{ $booking->book_id }}" action="{{ route('bookings.cancel', $booking->book_id) }}" method="POST" class="hidden">
+                                            @csrf
+                                            <input type="hidden" name="reason" id="userCancelReasonInput-{{ $booking->book_id }}">
+                                        </form>
+                                    @endif
                                 @endif
                             </div>
                         </div>
