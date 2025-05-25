@@ -101,9 +101,6 @@
             <div class="max-w-[1750px] mx-auto px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-5 gap-3 sm:gap-0">
                     <h2 class="text-lg sm:text-[22px] font-semibold m-0">What this place offers</h2>
-                    <button class="bg-transparent border border-airbnb-light text-airbnb-light py-1.5 sm:py-2 px-3 sm:px-4 rounded-2xl sm:rounded-3xl text-xs sm:text-sm hover:shadow-md cursor-pointer w-full sm:w-auto">
-                        Show All Amenities
-                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
