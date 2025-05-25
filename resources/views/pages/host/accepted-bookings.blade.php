@@ -19,7 +19,7 @@
         </div>
 
         <!-- Booking Requests -->
-        <div class="space-y-4">
+        <div class="space-y-6">
             @forelse($bookings as $booking)
                 <div class="bg-transparent border border-black rounded-lg p-5 shadow">
                     <div class="flex flex-col md:flex-row justify-between">
@@ -103,6 +103,35 @@
         </div>
     </div>
 
+    <!-- Cancellation Modal -->
+    <div id="cancellationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-airbnb-light p-6 rounded-lg max-w-md w-full">
+            <h3 class="text-lg font-semibold mb-4">Cancel Booking</h3>
+            <p class="mb-4">Are you sure you want to cancel this booking?</p>
+
+            <!-- Reason for Cancellation -->
+            <label for="cancelReason" class="block text-sm font-medium text-gray-700 mb-2">Reason (optional):</label>
+            <textarea id="cancelReason"
+                      class="w-full border border-gray-300 rounded-md p-2 mb-4"
+                      rows="3"
+                      placeholder="Enter a reason for cancellation"></textarea>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-2">
+                <button type="button"
+                        onclick="document.getElementById('cancellationModal').classList.add('hidden')"
+                        class="px-4 py-2 border border-airbnb-darkest hover:border-airbnb-dark hover:text-airbnb-dark hover:shadow-md py-[1px] px-4 rounded">
+                    Cancel
+                </button>
+                <button type="button"
+                        id="confirmCancelBtn"
+                        class="px-4 py-2 bg-airbnb-dark text-white rounded hover:bg-airbnb-darkest hover:shadow-md">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Contact Details Modal
@@ -129,62 +158,74 @@
                 return document.querySelector('meta[name="csrf-token"]')?.content;
             }
 
-            // Cancel Booking Logic
+            // Cancel Booking Modal Logic
+            const cancellationModal = document.getElementById('cancellationModal');
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            let selectedButton = null;
+
             document.querySelectorAll('.cancel-booking-btn').forEach(btn => {
-                btn.addEventListener('click', async function () {
-                    const bookingId = this.dataset.bookingId;
-
-                    if (!bookingId || isNaN(bookingId)) {
-                        alert('Invalid booking ID');
-                        console.error('Invalid booking ID:', bookingId);
-                        return;
-                    }
-
-                    if (!confirm('Are you sure you want to cancel this booking?')) return;
-
-                    // Show loading state
-                    const originalText = this.innerHTML;
-                    this.disabled = true;
-                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing';
-
-                    try {
-                        const response = await fetch(`/host/bookings/${bookingId}/cancel`, {
-                            method: 'PATCH',
-                            headers: {
-                                'X-CSRF-TOKEN': getCSRFToken(),
-                                'Accept': 'application/json'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.message || 'Failed to cancel booking');
-                        }
-
-                        const data = await response.json();
-
-                        alert(data.message);
-
-                        // Remove the booking card from the DOM
-                        const card = this.closest('.bg-transparent.border');
-                        if (card) {
-                            card.remove();
-                        }
-
-                        // Optional: Redirect
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        }
-
-                    } catch (error) {
-                        console.error('Error cancelling booking:', error);
-                        alert(error.message || 'An unknown error occurred.');
-                    }
-
-                    // Reset button text
-                    this.disabled = false;
-                    this.innerHTML = originalText;
+                btn.addEventListener('click', function () {
+                    selectedButton = this;
+                    cancellationModal.classList.remove('hidden');
                 });
+            });
+
+            confirmCancelBtn.addEventListener('click', async () => {
+                const bookingId = selectedButton.dataset.bookingId;
+                const reason = document.getElementById('cancelReason').value.trim();
+
+                if (!bookingId || isNaN(bookingId)) {
+                    alert('Invalid booking ID');
+                    console.error('Invalid booking ID:', bookingId);
+                    return;
+                }
+
+                // Show loading state
+                const originalText = selectedButton.innerHTML;
+                selectedButton.disabled = true;
+                selectedButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing';
+
+                try {
+                    const response = await fetch(`/host/bookings/${bookingId}/cancel`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRF-TOKEN': getCSRFToken(),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ reason })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to cancel booking');
+                    }
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    // Remove the booking card from the DOM
+                    const card = selectedButton.closest('.bg-transparent.border');
+                    if (card) {
+                        card.remove();
+                    }
+
+                    // Optional redirect
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+
+                } catch (error) {
+                    console.error('Error cancelling booking:', error);
+                    alert(error.message || 'An unknown error occurred.');
+                }
+
+                // Reset UI
+                selectedButton.disabled = false;
+                selectedButton.innerHTML = originalText;
+                document.getElementById('cancelReason').value = '';
+                cancellationModal.classList.add('hidden');
             });
         });
     </script>

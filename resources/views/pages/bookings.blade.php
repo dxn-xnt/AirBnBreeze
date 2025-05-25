@@ -3,7 +3,7 @@
 @section('title', 'Your Bookings')
 
 @section('content')
-    <!-- success message container -->
+    <!-- Success Message Container -->
     @if(session('success'))
         <div class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-airbnb-light-500 text-airbnb-darkest px-6 py-3 rounded-lg z-50 animate-fade-in-out">
             {{ session('success') }}
@@ -81,12 +81,18 @@
                                         Edit
                                     </button>
 
-                                    <!-- Cancel Button -->
-                                    <form action="{{ route('bookings.cancel', $booking->book_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?{{ $booking->book_status == 'upcoming' ? ' Cancellation fees may apply.' : '' }}');">
+                                    <!-- Cancel Button (Replaced with Modal Trigger) -->
+                                    <button type="button"
+                                            class="bg-airbnb-dark text-airbnb-light py-1.5 px-4 rounded-full text-sm w-full hover:bg-opacity-90 cancel-user-booking-btn"
+                                            data-booking-id="{{ $booking->book_id }}"
+                                            data-upcoming="{{ $booking->book_status == 'upcoming' ? '1' : '0' }}">
+                                        Cancel Booking
+                                    </button>
+
+                                    <!-- Hidden Form -->
+                                    <form id="userCancelForm-{{ $booking->book_id }}" action="{{ route('bookings.cancel', $booking->book_id) }}" method="POST" class="hidden">
                                         @csrf
-                                        <button type="submit" class="bg-airbnb-dark text-airbnb-light py-1.5 px-4 rounded-full text-sm w-full hover:bg-opacity-90">
-                                            Cancel Booking
-                                        </button>
+                                        <input type="hidden" name="reason" id="userCancelReasonInput-{{ $booking->book_id }}">
                                     </form>
                                 @endif
                             </div>
@@ -99,7 +105,6 @@
                 @endforelse
             </div>
 
-            <!-- Add More Bookings -->
             <!-- Explore More Section -->
             <div class="text-center py-4 pb-6 md:pb-8 max-w-[1200px] mx-auto px-4 sm:px-6">
                 <p class="mb-3 text-gray-600 italic text-sm sm:text-base">Add more booking trips?</p>
@@ -110,9 +115,98 @@
         </div>
     </div>
 
+    <!-- User Cancellation Modal -->
+    <div id="userCancellationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-airbnb-light p-6 rounded-lg max-w-md w-full">
+            <h3 class="text-lg font-semibold mb-4">Cancel Booking</h3>
+            <p class="mb-4" id="cancelMessage">Are you sure you want to cancel this booking?</p>
+
+            <!-- Reason for Cancellation -->
+            <label for="userCancelReason" class="block text-sm font-medium text-gray-700 mb-2">Reason (optional):</label>
+            <textarea id="userCancelReason"
+                      class="w-full border border-gray-300 rounded-md p-2 mb-4"
+                      rows="3"
+                      placeholder="Enter a reason for cancellation"></textarea>
+
+            <!-- Buttons -->
+            <div class="flex justify-end space-x-2">
+                <button type="button"
+                        onclick="document.getElementById('userCancellationModal').classList.add('hidden')"
+                        class="px-4 py-2 border border-airbnb-darkest hover:border-airbnb-dark hover:text-airbnb-dark hover:shadow-md py-[1px] px-4 rounded">
+                    Cancel
+                </button>
+                <button type="button"
+                        id="confirmUserCancelBtn"
+                        class="px-4 py-2 bg-airbnb-dark text-white rounded hover:bg-airbnb-darkest hover:shadow-md">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <style>
         body {
             background-color: #E3EED4;
         }
+
+        .animate-fade-in-out {
+            animation: fade 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('userCancellationModal');
+            const confirmBtn = document.getElementById('confirmUserCancelBtn');
+            const messageEl = document.getElementById('cancelMessage');
+            const reasonInput = document.getElementById('userCancelReason');
+
+            let selectedBookingId = null;
+
+            // Show modal on click
+            document.querySelectorAll('.cancel-user-booking-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    selectedBookingId = this.dataset.bookingId;
+                    const isUpcoming = this.dataset.upcoming === '1';
+
+                    // Update message dynamically
+                    messageEl.textContent = isUpcoming
+                        ? 'Are you sure you want to cancel this booking? Cancellation fees may apply.'
+                        : 'Are you sure you want to cancel this booking?';
+
+                    // Reset reason
+                    reasonInput.value = '';
+                    modal.classList.remove('hidden');
+                });
+            });
+
+            // Close modal manually
+            document.querySelector('#userCancellationModal button.bg-gray-300')?.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            // Submit cancellation
+            confirmBtn.addEventListener('click', () => {
+                if (!selectedBookingId) return;
+
+                // Set reason in hidden input
+                const reasonInputField = document.getElementById('userCancelReasonInput-' + selectedBookingId);
+                const reason = reasonInput.value.trim();
+                if (reasonInputField) {
+                    reasonInputField.value = reason;
+                }
+
+                // Submit form
+                const form = document.getElementById('userCancelForm-' + selectedBookingId);
+                if (form) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
 @endsection

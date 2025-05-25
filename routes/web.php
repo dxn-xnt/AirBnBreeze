@@ -93,7 +93,7 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
         Route::delete('/{property}', [PropertyController::class, 'destroy'])->name('property.delete');
     });
 
-    Route::prefix('bookings')->middleware(['auth'])->group(function () {
+    Route::prefix('bookings')->group(function () {
         Route::get('/pending', [HostController::class, 'viewPendingBookings'])->name('host.bookings.pending');
         Route::get('/accepted', [HostController::class, 'viewAcceptedBookings'])->name('host.bookings.accepted');
         Route::get('/ongoing', [HostController::class, 'viewOngoingBookings'])->name('host.bookings.ongoing');
@@ -102,7 +102,8 @@ Route::prefix('host')->middleware(['auth'])->group(function () {
 
         // Accept Booking
         Route::patch('/{booking}/approve', [HostController::class, 'acceptBooking'])->name('host.bookings.approve');
-        Route::patch('/{booking}/decline', [HostController::class, 'cancelBooking'])->name('host.bookings.cancel');
+        Route::patch('/{booking}/cancel', [HostController::class, 'cancelBooking'])->name('host.bookings.cancel');
+        Route::patch('/{booking}/decline', [HostController::class, 'declineBooking'])->name('host.bookings.decline');
 
     });
 

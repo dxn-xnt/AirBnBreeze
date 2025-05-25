@@ -118,7 +118,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Contact Details Modal
             const contactBtns = document.querySelectorAll('.contact-details-btn');
             const contactModal = document.getElementById('contactModal');
@@ -127,14 +127,14 @@
             const closeModal = document.getElementById('closeModal');
 
             contactBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     contactEmail.textContent = this.dataset.email;
                     contactPhone.textContent = this.dataset.phone || 'Not provided';
                     contactModal.classList.remove('hidden');
                 });
             });
 
-            closeModal.addEventListener('click', function() {
+            closeModal.addEventListener('click', function () {
                 contactModal.classList.add('hidden');
             });
 
@@ -148,15 +148,14 @@
                 return window.Laravel && window.Laravel.csrfToken ? window.Laravel.csrfToken : '{{ csrf_token() }}';
             }
 
-            // Approve Booking - FIXED URL
+            // Approve Booking
             document.querySelectorAll('.approve-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const bookingId = this.dataset.bookingId;
                     if (!bookingId) {
                         console.error('No booking ID found');
                         return;
                     }
-
                     if (confirm('Are you sure you want to approve this booking?')) {
                         fetch(`/host/bookings/${bookingId}/approve`, {
                             method: 'PATCH',
@@ -167,17 +166,13 @@
                             }
                         })
                             .then(response => {
-                                console.log('Response status:', response.status);
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
+                                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                                 return response.json();
                             })
                             .then(data => {
-                                console.log('Response data:', data);
                                 if (data.success) {
                                     alert('Booking approved successfully!');
-                                    location.reload();
+                                    location.reload(); // Reload the page after approval
                                 } else {
                                     alert(data.message || 'Failed to approve booking');
                                 }
@@ -190,15 +185,13 @@
                 });
             });
 
-            // Decline Booking - Fixed URL
             document.querySelectorAll('.decline-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const bookingId = this.dataset.bookingId;
                     if (!bookingId) {
                         console.error('No booking ID found');
                         return;
                     }
-
                     if (confirm('Are you sure you want to decline this booking?')) {
                         fetch(`/host/bookings/${bookingId}/decline`, {
                             method: 'PATCH',
@@ -209,17 +202,13 @@
                             }
                         })
                             .then(response => {
-                                console.log('Response status:', response.status);
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
+                                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                                 return response.json();
                             })
                             .then(data => {
-                                console.log('Response data:', data);
                                 if (data.success) {
                                     alert('Booking declined successfully!');
-                                    location.reload();
+                                    location.reload(); // Reload the page after approval
                                 } else {
                                     alert(data.message || 'Failed to decline booking');
                                 }

@@ -42,9 +42,11 @@ class PropertyController extends Controller
             'reviews' => $property->reviews_count ?? 0,
             'description' => $property->prop_description,
             'host' => [
-                'name' => $property->host->name,
+                'name' => $property->host->user_fname . ' ' . $property->host->user_lname,
                 'role' => 'Property Handler', // Adjust based on your logic
                 'image' => $property->host->profile_image_url ?? 'assets/images/default-host.jpg',
+                'phone' => $property->host->user_contact_number,
+                'email' => $property->host->user_email,
             ],
             'images' => [
                 'main' => $property->images->first()->img_url ?? 'assets/images/placeholder.jpg',

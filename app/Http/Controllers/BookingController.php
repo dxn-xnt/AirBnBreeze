@@ -8,7 +8,6 @@ use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redirect;
 
@@ -78,7 +77,7 @@ class BookingController extends Controller
         ]);
 
         // Save to database
-        Booking::create([
+        $booking = Booking::create([
             'book_check_in' => $request->input('start_date'),
             'book_check_out' => $request->input('end_date'),
             'book_total_price' => $request->input('total_cost'),
@@ -90,45 +89,15 @@ class BookingController extends Controller
             'book_status' => 'pending',
         ]);
 
-        // Get the property
-        $property = Property::findOrFail($property_id);
-
-        // Find pending bookings for this property on the specified date
-        // Alternative using raw SQL grouping
-        $latestBooking = Booking::whereRaw("prop_id = ? AND (book_status = 'pending' OR book_check_in = ?)", [
-            $property_id,
-            $request->input('start_date')
-        ])
-            ->orderBy('book_date_created', 'desc')
-            ->first();
-
-            // Create notification for each matching booking
-        try {
-            // Create notification
-            $notification = Notification::create([
-                'notif_type' => 'request',
-                'notif_message' => 'New Booking Request For ' . $property->title,
-                'notif_is_read' => false,
-                'notif_sender_id' => Auth::id(),
-                'notif_receiver_id' => $property->user_id,
-                'book_id' => $latestBooking->book_id,
-                'prop_id' => $property_id,
-            ]);
-
-        } catch (\Exception $e) {
-            // Log error if notification fails
-            Log::channel('bookings')->error('Failed to create booking notification', [
-                'error' => $e->getMessage(),
-                'booking_id' => $latestBooking->book_id ?? 'null',
-                'property_id' => $property_id,
-                'timestamp' => now()->toDateTimeString()
-            ]);
-
-            // Optionally re-throw the exception or handle it
-            throw $e;
-        }
-
-
+        // Optional: Notification for guest
+        Notification::create([
+            'notif_type' => 'booking_confirmation',
+            'notif_message' => 'Your booking request has been submitted',
+            'notif_is_read' => false,
+            'notif_sender_id' => $booking->property->user_id, // property owner
+            'notif_receiver_id' => Auth::id(), // guest
+            'prop_id' => $property_id,
+        ]);
 
         return redirect()->route('bookings.category', ['category' => 'pending'])
             ->with('success', 'Booking request submitted successfully.');
@@ -145,7 +114,7 @@ class BookingController extends Controller
     public function show($id)
     {
         $booking = Booking::with(['property' => function ($query) {
-            $query->with('images'); // Eager load images relationship
+            $query->with('images');
         }])->findOrFail($id);
 
         // Ensure the user can only view their own bookings
