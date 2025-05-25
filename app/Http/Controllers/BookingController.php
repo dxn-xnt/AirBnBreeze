@@ -66,20 +66,6 @@ class BookingController extends Controller
     // Process the final booking request
     public function processBooking(Request $request, $property_id)
     {
-        // Get the authenticated user's ID
-        $userId = Auth::id();
-
-        // Check if the user has already booked this property
-        $existingBooking = Booking::where('user_guest_id', $userId)
-            ->where('prop_id', $property_id)
-            ->whereIn('book_status', ['pending', 'accepted']) // or whatever statuses you want to restrict
-            ->exists();
-
-        if ($existingBooking) {
-            return redirect()->back()
-                ->with('error', 'You have already requested to book this property.');
-        }
-
         // Validate request
         $request->validate([
             'start_date' => 'required|date',
@@ -99,16 +85,17 @@ class BookingController extends Controller
             'book_adult_count' => $request->input('book_adult_count'),
             'book_child_count' => $request->input('book_child_count'),
             'prop_id' => $property_id,
-            'user_guest_id' => $userId,
+            'user_guest_id' => Auth::id(),
             'book_status' => 'pending',
         ]);
 
+        // Optional: Notification for guest
         Notification::create([
             'notif_type' => 'booking_confirmation',
             'notif_message' => 'Your booking request has been submitted',
             'notif_is_read' => false,
             'notif_sender_id' => $booking->property->user_id, // property owner
-            'notif_receiver_id' => $userId,
+            'notif_receiver_id' => Auth::id(),
             'book_id' => $booking->book_id,
             'prop_id' => $property_id,
         ]);
