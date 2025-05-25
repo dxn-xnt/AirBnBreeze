@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenity;
 use App\Models\Property;
+use Illuminate\Support\Facades\Auth;
 use App\Models\PropertyAmenity;
 use App\Models\PropertyImage;
 use App\Models\PropertyRules;
+use App\Models\Booking;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,8 +29,18 @@ class PropertyController extends Controller
     public function show($id)
     {
         // Fetch the property with its images, host, and amenities
-        $property = Property::with(['images', 'host', 'amenities'])
-            ->findOrFail($id);
+        $property = Property::with(['images', 'host', 'amenities'])->findOrFail($id);
+
+        // Check if the authenticated user has already requested this property
+        $userId = Auth::id();
+        $hasRequested = false;
+
+        if ($userId) {
+            $hasRequested = Booking::where('user_guest_id', $userId)
+                ->where('prop_id', $id)
+                ->whereIn('book_status', ['pending', 'accepted'])
+                ->exists();
+        }
 
         // Prepare the data for the view
         $data = [
@@ -43,7 +55,7 @@ class PropertyController extends Controller
             'description' => $property->prop_description,
             'host' => [
                 'name' => $property->host->user_fname . ' ' . $property->host->user_lname,
-                'role' => 'Property Handler', // Adjust based on your logic
+                'role' => 'Property Handler',
                 'image' => $property->host->profile_image_url ?? 'assets/images/default-host.jpg',
                 'phone' => $property->host->user_contact_number,
                 'email' => $property->host->user_email,
@@ -54,7 +66,7 @@ class PropertyController extends Controller
             ],
             'amenities' => $property->amenities->map(function ($amenity) {
                 return [
-                    'icon' => $amenity->icon, // Ensure you have an icon column in the amenities table
+                    'icon' => $amenity->icon,
                     'name' => $amenity->name,
                 ];
             })->toArray(),
@@ -77,7 +89,7 @@ class PropertyController extends Controller
             ],
         ];
 
-        return view('pages.property-details', compact('data'));
+        return view('pages.property-details', compact('data', 'hasRequested'));
     }
 
     public function search(Request $request)
