@@ -4,7 +4,12 @@
 
 @section('content')
     <div class="max-w-[1750px] mx-auto px-[1rem] sm:px-[1.5rem] md:px-[2rem] lg:px-[4rem] xl:px-[8rem] mt-[4rem] md:mt-[7.5rem]">
-        <!-- Property Title -->
+        @if(isset($hasRequested) && $hasRequested)
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow-md">
+                <p class="font-semibold">You have already requested to book this property.</p>
+                <p class="text-sm mt-1">Please wait for the host's response or check your bookings page.</p>
+            </div>
+        @endif
         <h1 class="text-[1.5rem] sm:text-[1.75rem] font-semibold text-airbnb-darkest mb-[1rem] sm:mb-[1.25rem]">
             {{ $data['title'] }}
         </h1>
@@ -65,7 +70,11 @@
             <div class="w-full sm:w-auto mt-0 sm:mt-4 lg:mt-0">
                 <form action="{{ route('bookings.book', ['id' => $data['id']]) }}" method="POST">
                     @csrf
-                    <button type="submit" class="bg-airbnb-darkest text-airbnb-light border-none py-2 sm:py-3 px-6 sm:px-12 text-sm sm:text-base font-light rounded-2xl sm:rounded-3xl cursor-pointer hover:bg-opacity-90 w-full sm:w-auto">
+                    <button
+                        type="submit"
+                        class="bg-airbnb-darkest text-airbnb-light border-none py-2 sm:py-3 px-6 sm:px-12 text-sm sm:text-base font-light rounded-2xl sm:rounded-3xl cursor-pointer hover:bg-opacity-90 w-full sm:w-auto
+            @if(isset($hasRequested) && $hasRequested) opacity-50 cursor-not-allowed @endif"
+                        @if(isset($hasRequested) && $hasRequested) disabled @endif>
                         Request Booking
                     </button>
                 </form>

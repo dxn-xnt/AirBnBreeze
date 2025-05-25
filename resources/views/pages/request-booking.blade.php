@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Request Booking')
 @section('content')
-    <x-layout.bookings-header />
     <div class="min-h-screen bg-[#E3EED4] pt-[4rem] md:pt-[7.5rem] pb-[1.5rem] sm:pb-[2rem] px-[1rem] sm:px-[1.5rem] md:px-[2rem] lg:px-[4rem] xl:px-[8rem]">
         <div class="max-w-[1750px] mx-auto">
             <!-- Back Button -->
