@@ -14,8 +14,8 @@ class Notification extends Model
         'notif_is_read',
         'notif_sender_id',
         'notif_receiver_id',
+        'book_id',
         'prop_id',
-        'created_at',
     ];
     public function property(){
         return $this->belongsTo(Property::class,'prop_id');
