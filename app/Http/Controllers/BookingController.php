@@ -117,6 +117,7 @@ class BookingController extends Controller
             'book_status' => 'pending',
         ]);
 
+        // Optional: Notification for guest
         Notification::create([
             'notif_type' => 'booking_confirmation',
             'notif_message' => 'Your booking request has been submitted',
