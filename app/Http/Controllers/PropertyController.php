@@ -82,6 +82,7 @@ class PropertyController extends Controller
 
     public function search(Request $request)
     {
+        // Validate input fields
         $validated = $request->validate([
             'location' => 'required|string',
             'check_in' => 'required|date|after_or_equal:today',
@@ -90,15 +91,36 @@ class PropertyController extends Controller
             'guests' => 'required|integer|min:1'
         ]);
 
-        // Base query with eager loading
+        $checkIn = $validated['check_in'];
+        $checkOut = $validated['check_out'];
+
+        // Base query with filters
         $query = Property::with(['images', 'host', 'amenities'])
             ->where('prop_address', 'like', '%' . $validated['location'] . '%')
             ->where('prop_room_count', '>=', $validated['rooms'])
             ->where('prop_max_guest', '>=', $validated['guests']);
 
+        // Filter out properties that have overlapping bookings using correct column names
+        $query->whereNotIn('prop_id', function ($q) use ($checkIn, $checkOut) {
+            $q->from('booking')
+                ->select('prop_id')
+                ->whereIn('book_status', ['accepted', 'ongoing', 'upcoming'])
+                ->where(function ($query) use ($checkIn, $checkOut) {
+                    $query->whereBetween('book_check_in', [$checkIn, $checkOut])
+                        ->orWhereBetween('book_check_out', [$checkIn, $checkOut])
+                        ->orWhere(function ($inner) use ($checkIn, $checkOut) {
+                            $inner->where('book_check_in', '<=', $checkIn)
+                                ->where('book_check_out', '>=', $checkOut);
+                        });
+                });
+        });
+
         $properties = $query->get();
 
-        // Store in session
+        // Debugging: See what's being returned
+        // dd($properties); // Uncomment this line to check if data exists
+
+        // Store results in session
         session([
             'search_results' => [
                 'properties' => $properties,

@@ -95,7 +95,8 @@ class BookingController extends Controller
             'notif_message' => 'Your booking request has been submitted',
             'notif_is_read' => false,
             'notif_sender_id' => $booking->property->user_id, // property owner
-            'notif_receiver_id' => Auth::id(), // guest
+            'notif_receiver_id' => Auth::id(),
+            'book_id' => $booking->book_id,
             'prop_id' => $property_id,
         ]);
 
