@@ -1,5 +1,9 @@
 FROM php:8.2-fpm
 
+# Copy only Vite-related files first for caching
+COPY package*.json ./
+RUN npm install
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -22,6 +26,9 @@ WORKDIR /var/www
 
 # Copy Laravel project files
 COPY . .
+
+RUN npm run build
+COPY --from=nodebuild /app/public/build /var/www/public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
