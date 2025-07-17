@@ -40,8 +40,9 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache
-    
-RUN php artisan generate:key
+
+RUN php artisan key:generate
+
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
