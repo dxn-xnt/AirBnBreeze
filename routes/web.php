@@ -50,8 +50,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Property Booking Process
     Route::prefix('property/{id}')->group(function () {
-        Route::get('/book', [BookingController::class, 'book'])->name('bookings.book');
-        Route::post('/book', [BookingController::class, 'book'])->name('bookings.book');
+        Route::get('/book', [BookingController::class, 'book'])->name('bookings.book.get');
+        Route::post('/book', [BookingController::class, 'book'])->name('bookings.book.post');
         Route::get('/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
         Route::post('/process-booking', [BookingController::class, 'processBooking'])->name('bookings.process');
         Route::get('/cancel-request', [BookingController::class, 'cancelRequest'])->name('bookings.cancel-request');
