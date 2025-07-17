@@ -37,7 +37,9 @@ COPY --from=nodebuild /app/public/build /var/www/public/build
 RUN composer install --no-dev --optimize-autoloader
 
 # Laravel configuration
-RUN php artisan key:generate
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www \
