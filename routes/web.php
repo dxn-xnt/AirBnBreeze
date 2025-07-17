@@ -28,7 +28,7 @@ Route::middleware(['guest'])->group(function () {
 // Authenticated Routes
 Route::middleware(['auth'])->group(function () {
     // Booking Routes
-    Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
+    //Route::post('/property/{id}/book', [BookingController::class, 'book'])->name('bookings.book');
 
     // Updated booking routes with category support
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
