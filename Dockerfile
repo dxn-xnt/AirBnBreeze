@@ -1,19 +1,23 @@
-# --- Build Stage ---
+# --- Build Vite Assets ---
 FROM node:18 as nodebuild
 WORKDIR /app
 
-# Copy only Vite-related files first for caching
-COPY package*.json ./
+# Install Node dependencies
+COPY package*.json vite.config.js ./
 RUN npm install
 
-# Copy rest of the app
-COPY . .
+# Copy frontend assets
+COPY resources/ resources/
+COPY public/ public/
+COPY vite.config.js .
+
+# Run Vite build (will generate public/build/manifest.json)
 RUN npm run build
 
-# --- PHP/Laravel Stage ---
+# --- PHP + Laravel Stage ---
 FROM php:8.2-cli
 
-# System dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git unzip curl libpq-dev libzip-dev zip && \
     docker-php-ext-install pdo pdo_pgsql zip
@@ -23,23 +27,24 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy Laravel app
+# Copy Laravel source (excluding node_modules, etc.)
 COPY . .
 
-# Copy Vite build from previous stage
+# Copy only the Vite build output
 COPY --from=nodebuild /app/public/build /var/www/public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Laravel config
-RUN php artisan config:cache
+# Laravel configuration
+RUN php artisan key:generate
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
-# Expose public port (important for Render)
+# Expose port (optional for Docker local run)
 EXPOSE 8000
 
-# Start Laravel dev server (for production you should use nginx, but this works fine for testing)
+# Start Laravel's development server (for production, use PHP-FPM + Nginx)
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
