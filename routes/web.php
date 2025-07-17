@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
     // Updated booking routes with category support
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{category}', [BookingController::class, 'index'])->name('bookings.category');
-    Route::get('/bookings/details/{id}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/details/{id}', [BookingController::class, 'show'])->name('bookings.show.details');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/profile/edit/{id}', [UserController::class, 'editProfile'])->name('owner.edit');
