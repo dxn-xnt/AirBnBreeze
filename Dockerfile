@@ -41,7 +41,6 @@ RUN php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache
 
-RUN php artisan key:generate
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www \
@@ -52,3 +51,5 @@ EXPOSE 8000
 
 # Start Laravel's development server (for production, use PHP-FPM + Nginx)
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
+
