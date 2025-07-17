@@ -3,7 +3,7 @@ FROM node:18 as nodebuild
 WORKDIR /app
 
 # Install Node dependencies
-COPY package*.json vite.config.js ./
+COPY package*.json vite.config.js tailwind.config.js ./ 
 RUN npm install
 
 # Copy frontend assets
